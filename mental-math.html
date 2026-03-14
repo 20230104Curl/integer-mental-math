@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>正の数、負の数 暗算トレーニング</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --muted: #64748b;
+      --line: #e2e8f0;
+      --text: #0f172a;
+      --primary: #2563eb;
+      --primary-2: #1d4ed8;
+      --danger: #dc2626;
+      --danger-2: #b91c1c;
+      --ok: #059669;
+      --ok-bg: #ecfdf5;
+      --warn-bg: #fefce8;
+      --warn: #a16207;
+      --info-bg: #eff6ff;
+      --info: #1d4ed8;
+      --soft: #f1f5f9;
+      --shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .wrap {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 18px;
+    }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+    .title {
+      margin: 0;
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    .subtitle {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+    .top-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .grid {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 18px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .card-header {
+      padding: 18px 18px 0;
+      font-size: 20px;
+      font-weight: 800;
+    }
+    .card-body { padding: 18px; }
+    .stack { display: grid; gap: 14px; }
+    .row { display: grid; gap: 8px; }
+    .label { font-size: 14px; font-weight: 700; }
+    .input {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+      padding: 12px 14px;
+      font-size: 16px;
+    }
+    .btn {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--text);
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.15s ease;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+    .btn.primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .btn.primary:hover { background: var(--primary-2); }
+    .btn.danger { background: var(--danger); color: #fff; border-color: var(--danger); }
+    .btn.danger:hover { background: var(--danger-2); }
+    .btn.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .btn.soft { background: var(--soft); }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .full { width: 100%; }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 800;
+      border: 1px solid var(--line);
+      background: #fff;
+    }
+    .stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+    .stat {
+      background: var(--soft);
+      border-radius: 18px;
+      padding: 14px;
+    }
+    .stat .k { color: var(--muted); font-size: 13px; }
+    .stat .v { margin-top: 6px; font-size: 26px; font-weight: 800; }
+    .progress-wrap { display: grid; gap: 8px; }
+    .progress-head { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); }
+    .progress {
+      height: 12px;
+      width: 100%;
+      border-radius: 999px;
+      background: #e5e7eb;
+      overflow: hidden;
+    }
+    .progress > div {
+      height: 100%;
+      width: 0%;
+      background: var(--primary);
+      transition: width 0.2s ease;
+    }
+    .problem-box {
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background: #fff;
+      padding: 26px;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+    .problem-meta { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; color: var(--muted); font-size: 13px; }
+    .problem-text {
+      margin-top: 16px;
+      font-size: 56px;
+      font-weight: 800;
+      line-height: 1.25;
+      word-break: break-word;
+    }
+    .answer-screen {
+      margin: 26px auto 0;
+      max-width: 560px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: var(--soft);
+      padding: 16px;
+      font-size: 38px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      min-height: 82px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .key-grid-sign { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; max-width: 560px; margin: 16px auto 0; }
+    .key-grid-num { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; max-width: 560px; margin: 16px auto 0; }
+    .key {
+      height: 72px;
+      border-radius: 20px;
+      font-size: 30px;
+      font-weight: 800;
+    }
+    .key.small { font-size: 22px; }
+    .key.zero { grid-column: span 2; }
+    .message { margin-top: 14px; color: var(--muted); font-size: 14px; }
+    .combo { margin-top: 8px; color: #ea580c; font-weight: 800; animation: pulse 1s infinite; }
+    @keyframes pulse { 0% {opacity: 1;} 50% {opacity: 0.55;} 100% {opacity: 1;} }
+    .result-stack { margin-top: 16px; display: grid; gap: 10px; justify-content: center; }
+    .banner {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 18px;
+      padding: 10px 16px;
+      font-weight: 800;
+      font-size: 15px;
+    }
+    .banner.ok { background: var(--ok-bg); color: var(--ok); }
+    .banner.info { background: var(--info-bg); color: var(--info); }
+    .banner.warn { background: var(--warn-bg); color: var(--warn); }
+    .section-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .mini-card {
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 16px;
+    }
+    .mini-title { font-size: 18px; font-weight: 800; margin-bottom: 12px; }
+    .note { font-size: 12px; color: var(--muted); margin-top: 8px; }
+    .history { display: grid; gap: 8px; }
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      background: var(--soft);
+      border-radius: 14px;
+      padding: 10px 12px;
+      font-size: 14px;
+    }
+    .history-item .left { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .tag { border-radius: 999px; padding: 4px 10px; font-size: 12px; font-weight: 800; }
+    .tag.ok { background: #dcfce7; color: #166534; }
+    .tag.ng { background: #fee2e2; color: #991b1b; }
+    ul.info-list { margin: 0; padding-left: 20px; display: grid; gap: 8px; color: #334155; }
+    .special-box {
+      border: 1px solid var(--line);
+      background: var(--soft);
+      border-radius: 18px;
+      padding: 16px;
+    }
+    .hidden { display: none !important; }
+    @media (max-width: 980px) {
+      .grid { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .section-grid { grid-template-columns: 1fr; }
+      .problem-text { font-size: 40px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div>
+        <h1 class="title">正の数、負の数 暗算トレーニング</h1>
+        <p class="subtitle">加減混合・乗除混合・四則混合を、タイムアタック形式で練習できる試作版です。</p>
+      </div>
+      <div class="top-actions">
+        <button id="soundToggle" class="btn primary">音あり</button>
+        <div class="chip">試作プロトタイプ</div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="card-header">設定</div>
+        <div class="card-body stack">
+          <div class="row">
+            <div class="label">プレイヤー名</div>
+            <input id="playerName" class="input" maxlength="12" value="あなた" />
+          </div>
+
+          <div id="modeSection" class="row">
+            <div class="label">出題モード</div>
+            <div class="grid-2">
+              <button class="btn mode-btn active" data-mode="time">タイムアタック</button>
+              <button class="btn mode-btn" data-mode="target">目標達成</button>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="label">計算の種類</div>
+            <div class="stack" id="opButtons"></div>
+          </div>
+
+          <div class="row">
+            <div class="label">問題レベル</div>
+            <div class="stack" id="levelButtons"></div>
+          </div>
+
+          <div id="specialInfo" class="special-box hidden">
+            <div class="label">スペシャルモード</div>
+            <div style="margin-top:8px;font-size:24px;font-weight:800;">サドンデス</div>
+            <div style="margin-top:6px;color:var(--muted);font-size:14px;">四則混合だけのサドンデスです</div>
+          </div>
+
+          <div id="timeSection" class="row">
+            <div class="label">制限時間</div>
+            <div class="grid-3">
+              <button class="btn time-btn" data-time="30">30秒</button>
+              <button class="btn time-btn active" data-time="60">60秒</button>
+              <button class="btn time-btn" data-time="90">90秒</button>
+            </div>
+          </div>
+
+          <div id="targetSection" class="row hidden">
+            <div class="label">目標正解数</div>
+            <div class="grid-3">
+              <button class="btn target-btn active" data-target="10">10問</button>
+              <button class="btn target-btn" data-target="15">15問</button>
+              <button class="btn target-btn" data-target="20">20問</button>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <button id="startBtn" class="btn primary">開始</button>
+            <button id="resetBtn" class="btn">リセット</button>
+          </div>
+
+          <button id="clearSaveBtn" class="btn danger full">記録をすべて消す</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">プレイ画面</div>
+        <div class="card-body stack">
+          <div class="stats">
+            <div class="stat"><div class="k">モード</div><div id="statMode" class="v">タイムアタック</div></div>
+            <div class="stat"><div class="k">時間</div><div id="statTime" class="v">60秒</div></div>
+            <div class="stat"><div class="k">正解</div><div id="statCorrect" class="v">0問</div></div>
+            <div class="stat"><div class="k">正答率</div><div id="statAccuracy" class="v">0%</div></div>
+            <div class="stat"><div class="k">コンボ</div><div id="statCombo" class="v">0</div></div>
+          </div>
+
+          <div id="progressArea" class="progress-wrap">
+            <div class="progress-head"><span>進行状況</span><span id="progressText">0%</span></div>
+            <div class="progress"><div id="progressBar"></div></div>
+          </div>
+
+          <div class="problem-box">
+            <div class="problem-meta">
+              <span>問題</span>
+              <span id="levelChip" class="chip">レベル1</span>
+              <span id="specialChip" class="chip hidden">隠しステージ</span>
+            </div>
+            <div id="problemText" class="problem-text">--</div>
+
+            <div id="answerScreen" class="answer-screen">符号を選んでください</div>
+
+            <div class="key-grid-sign">
+              <button id="signPlus" class="btn key">＋</button>
+              <button id="signMinus" class="btn key">－</button>
+            </div>
+
+            <div class="key-grid-num">
+              <button class="btn key num-btn" data-digit="7">7</button>
+              <button class="btn key num-btn" data-digit="8">8</button>
+              <button class="btn key num-btn" data-digit="9">9</button>
+              <button id="backBtn" class="btn key small">⌫</button>
+              <button class="btn key num-btn" data-digit="4">4</button>
+              <button class="btn key num-btn" data-digit="5">5</button>
+              <button class="btn key num-btn" data-digit="6">6</button>
+              <button id="clearBtn" class="btn key small">C</button>
+              <button class="btn key num-btn" data-digit="1">1</button>
+              <button class="btn key num-btn" data-digit="2">2</button>
+              <button class="btn key num-btn" data-digit="3">3</button>
+              <div></div>
+              <button class="btn key zero num-btn" data-digit="0">0</button>
+              <div></div>
+            </div>
+
+            <div style="max-width:560px;margin:16px auto 0;">
+              <button id="submitBtn" class="btn primary full key small">回答する</button>
+            </div>
+
+            <div id="message" class="message">スタートすると問題が出ます</div>
+            <div id="comboBanner" class="combo hidden">🔥 3連続正解！</div>
+
+            <div id="resultStack" class="result-stack hidden">
+              <div id="summaryBanner" class="banner ok"></div>
+              <div id="lastBanner" class="banner info hidden"></div>
+              <div id="recordBanner" class="banner warn hidden">🎉 NEW RECORD!</div>
+            </div>
+          </div>
+
+          <div class="section-grid">
+            <div class="mini-card">
+              <div class="mini-title">自己ベスト</div>
+              <div id="recordText">まだこの条件の記録はありません。</div>
+              <div class="note">最高コンボ：<span id="bestComboText">0</span></div>
+              <div class="note">計算の種類・モード・時間・達成数・レベルごとに記録されます。</div>
+            </div>
+
+            <div class="mini-card">
+              <div class="mini-title">最近の解答</div>
+              <div id="history" class="history"><div class="note">まだ解答履歴はありません。</div></div>
+            </div>
+          </div>
+
+          <div class="section-grid">
+            <div class="mini-card">
+              <div class="mini-title">この試作で入った新機能</div>
+              <ul class="info-list">
+                <li>正解音・不正解音・終了音・キー入力音の簡易サウンド</li>
+                <li>レベル1＝2項、レベル2＝3項、レベル3＝4項</li>
+                <li>スペシャルステージ＝5項の隠しステージ</li>
+                <li>スペシャルは四則混合専用のサドンデス</li>
+                <li>解放条件は四則混合レベル1〜3を10問・20秒/30秒/40秒以内で達成</li>
+                <li>条件ごとの自己ベスト保存</li>
+                <li>加減混合・乗除混合・四則混合の3種類</li>
+                <li>タブレット用の大きな符号・数字キーボード</li>
+                <li>累乗の上付き表示に対応</li>
+                <li>同じ問題パターンの連続出題を抑制</li>
+              </ul>
+            </div>
+            <div class="mini-card">
+              <div class="mini-title">今後さらに強くできる点</div>
+              <ul class="info-list">
+                <li>ミスの傾向分析（符号ミス、計算順序ミス）</li>
+                <li>効果音の種類追加やBGMの導入</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const OPERATIONS = {
+      addsub: "加減混合",
+      muldiv: "乗除混合",
+      powermix: "四則混合",
+    };
+
+    const GAME_MODES = {
+      time: "タイムアタック",
+      target: "目標達成",
+      sudden: "サドンデス",
+    };
+
+    const LEVELS = {
+      1: "レベル1",
+      2: "レベル2",
+      3: "レベル3",
+      4: "スペシャル",
+    };
+
+    const SPECIAL_UNLOCK_RULES = {
+      1: { targetCorrect: 10, maxSeconds: 20 },
+      2: { targetCorrect: 10, maxSeconds: 30 },
+      3: { targetCorrect: 10, maxSeconds: 40 },
+    };
+
+    const STORAGE_KEYS = {
+      records: "integer-mental-math-records",
+      clears: "integer-mental-math-clears",
+      last: "integer-mental-math-last-session",
+    };
+
+    const state = {
+      gameMode: "time",
+      operationType: "addsub",
+      level: 1,
+      timeLimit: 60,
+      targetCorrect: 10,
+      running: false,
+      finished: false,
+      recentPatterns: [],
+      problem: null,
+      answerSign: "",
+      answerDigits: "",
+      remaining: 60,
+      elapsed: 0,
+      correct: 0,
+      wrong: 0,
+      history: [],
+      message: "スタートすると問題が出ます",
+      soundOn: true,
+      records: loadRecords(),
+      lastSession: loadLastSession(),
+      clears: loadClears(),
+      playerName: "あなた",
+      newRecord: false,
+      combo: 0,
+      bestCombo: 0,
+      timer: null,
+    };
+
+    const els = {
+      soundToggle: document.getElementById("soundToggle"),
+      playerName: document.getElementById("playerName"),
+      modeSection: document.getElementById("modeSection"),
+      timeSection: document.getElementById("timeSection"),
+      targetSection: document.getElementById("targetSection"),
+      specialInfo: document.getElementById("specialInfo"),
+      opButtons: document.getElementById("opButtons"),
+      levelButtons: document.getElementById("levelButtons"),
+      startBtn: document.getElementById("startBtn"),
+      resetBtn: document.getElementById("resetBtn"),
+      clearSaveBtn: document.getElementById("clearSaveBtn"),
+      statMode: document.getElementById("statMode"),
+      statTime: document.getElementById("statTime"),
+      statCorrect: document.getElementById("statCorrect"),
+      statAccuracy: document.getElementById("statAccuracy"),
+      statCombo: document.getElementById("statCombo"),
+      progressArea: document.getElementById("progressArea"),
+      progressText: document.getElementById("progressText"),
+      progressBar: document.getElementById("progressBar"),
+      levelChip: document.getElementById("levelChip"),
+      specialChip: document.getElementById("specialChip"),
+      problemText: document.getElementById("problemText"),
+      answerScreen: document.getElementById("answerScreen"),
+      signPlus: document.getElementById("signPlus"),
+      signMinus: document.getElementById("signMinus"),
+      backBtn: document.getElementById("backBtn"),
+      clearBtn: document.getElementById("clearBtn"),
+      submitBtn: document.getElementById("submitBtn"),
+      message: document.getElementById("message"),
+      comboBanner: document.getElementById("comboBanner"),
+      resultStack: document.getElementById("resultStack"),
+      summaryBanner: document.getElementById("summaryBanner"),
+      lastBanner: document.getElementById("lastBanner"),
+      recordBanner: document.getElementById("recordBanner"),
+      recordText: document.getElementById("recordText"),
+      bestComboText: document.getElementById("bestComboText"),
+      history: document.getElementById("history"),
+    };
+
+    function randInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+    function randNo01(min, max) {
+      let n = 0;
+      do { n = randInt(min, max); } while (n === 0 || n === 1 || n === -1);
+      return n;
+    }
+    function choice(arr) { return arr[randInt(0, arr.length - 1)]; }
+    function getTermCount(level) { return level === 1 ? 2 : level === 2 ? 3 : level === 3 ? 4 : 5; }
+    function formatSignedNumber(n) { return n < 0 ? `(${n})` : `${n}`; }
+    function powerText(base, exponent) { return `(${base})^${exponent}`; }
+    function powerHTML(base, exponent) { return `<span>(${base})<sup style="font-size:.55em;position:relative;top:-0.55em;">${exponent}</sup></span>`; }
+    function plainTerm(value) { return { text: formatSignedNumber(value), display: formatSignedNumber(value), value }; }
+    function powerTerm(base, exponent) { return { text: powerText(base, exponent), display: powerHTML(base, exponent), value: base ** exponent }; }
+    function createPowerTerm() { return powerTerm(choice([-4, -3, -2, 2, 3, 4]), choice([2, 3])); }
+    function buildExpression(terms, ops) {
+      let text = terms[0].text;
+      let display = terms[0].display;
+      for (let i = 1; i < terms.length; i++) {
+        text += ` ${ops[i - 1]} ${terms[i].text}`;
+        display += ` ${ops[i - 1]} ${terms[i].display}`;
+      }
+      return { text, display };
+    }
+
+    function createAddSubMixedProblem(level) {
+      const count = getTermCount(level);
+      const nums = Array.from({ length: count }, () => randNo01(-18, 18));
+      const ops = [];
+      for (let i = 0; i < count - 1; i++) {
+        const next = nums[i + 1];
+        ops.push(next < 0 && Math.random() < 0.65 ? "-" : choice(["+", "-"]));
+      }
+      let answer = nums[0];
+      for (let i = 1; i < count; i++) answer = ops[i - 1] === "+" ? answer + nums[i] : answer - nums[i];
+      const terms = nums.map(plainTerm);
+      const expression = buildExpression(terms, ops);
+      return { ...expression, answer, patternSignature: ops.join("") };
+    }
+
+    function createMulDivMixedProblem(level, includePowers = true) {
+      const count = getTermCount(level);
+      const start = randNo01(-10, 10);
+      const ops = Array.from({ length: count - 1 }, () => choice(["×", "÷"]));
+      const terms = [plainTerm(start)];
+      let current = start;
+
+      for (let i = 0; i < ops.length; i++) {
+        if (ops[i] === "×") {
+          const usePower = includePowers && Math.random() < 0.35;
+          if (usePower) {
+            const p = createPowerTerm();
+            terms.push(p);
+            current *= p.value;
+          } else {
+            const t = plainTerm(randNo01(-9, 9));
+            terms.push(t);
+            current *= t.value;
+          }
+        } else {
+          const powerCandidates = includePowers
+            ? [powerTerm(2,2), powerTerm(-2,2), powerTerm(2,3), powerTerm(-2,3), powerTerm(3,2), powerTerm(-3,2)].filter(item => current % item.value === 0)
+            : [];
+          const usePower = includePowers && Math.random() < 0.3 && powerCandidates.length > 0;
+          if (usePower) {
+            const picked = choice(powerCandidates);
+            terms.push(picked);
+            current /= picked.value;
+          } else {
+            const divisors = [-9,-8,-7,-6,-5,-4,-3,-2,2,3,4,5,6,7,8,9].filter(d => current % d === 0);
+            const picked = divisors.length ? choice(divisors) : 2;
+            const t = plainTerm(picked);
+            terms.push(t);
+            current /= t.value;
+          }
+        }
+      }
+      const expression = buildExpression(terms, ops);
+      return { ...expression, answer: current, patternSignature: ops.join("") };
+    }
+
+    function createPowerMixedProblem(level) {
+      const count = getTermCount(level);
+      function createFactor() {
+        return Math.random() < 0.55 ? createPowerTerm() : plainTerm(randNo01(-6, 6));
+      }
+      function createMulDivChain(chainLength) {
+        const terms = [createFactor()];
+        const ops = [];
+        let value = terms[0].value;
+        for (let i = 1; i < chainLength; i++) {
+          const op = choice(["×", "÷"]);
+          if (op === "×") {
+            const factor = createFactor();
+            terms.push(factor);
+            ops.push("×");
+            value *= factor.value;
+          } else {
+            const divideCandidates = [plainTerm(2), plainTerm(3), plainTerm(4), plainTerm(5), plainTerm(-2), plainTerm(-3), powerTerm(2,2), powerTerm(-2,2), powerTerm(2,3), powerTerm(3,2)]
+              .filter(item => item.value !== 0 && value % item.value === 0);
+            if (divideCandidates.length > 0) {
+              const divisor = choice(divideCandidates);
+              terms.push(divisor);
+              ops.push("÷");
+              value /= divisor.value;
+            } else {
+              const factor = createFactor();
+              terms.push(factor);
+              ops.push("×");
+              value *= factor.value;
+            }
+          }
+        }
+        return { terms, ops, value };
+      }
+      const groupCount = Math.min(count, choice([2,2,3]));
+      const rawLengths = Array.from({ length: groupCount }, () => 1);
+      let remaining = count - groupCount;
+      while (remaining > 0) {
+        const idx = randInt(0, groupCount - 1);
+        rawLengths[idx] += 1;
+        remaining -= 1;
+      }
+      const groups = rawLengths.map(len => createMulDivChain(len));
+      const groupOps = Array.from({ length: groups.length - 1 }, () => choice(["+", "-"]));
+      let answer = groups[0].value;
+      for (let i = 1; i < groups.length; i++) answer = groupOps[i - 1] === "+" ? answer + groups[i].value : answer - groups[i].value;
+      let allTerms = [...groups[0].terms];
+      let allOps = [...groups[0].ops];
+      for (let i = 1; i < groups.length; i++) {
+        allOps.push(groupOps[i - 1]);
+        allTerms.push(...groups[i].terms);
+        allOps.push(...groups[i].ops);
+      }
+      const expression = buildExpression(allTerms, allOps);
+      const chainSignature = groups.map(g => g.ops.join("")).join("|");
+      const patternSignature = `${chainSignature}::${groupOps.join("")}`;
+      return { ...expression, answer, patternSignature };
+    }
+
+    function generateProblem(type, level, recentSignatures = []) {
+      const creators = {
+        addsub: () => createAddSubMixedProblem(level),
+        muldiv: () => createMulDivMixedProblem(level, true),
+        powermix: () => createPowerMixedProblem(level),
+      };
+      const makeProblem = creators[type] || creators.addsub;
+      for (let attempt = 0; attempt < 12; attempt++) {
+        const problem = makeProblem();
+        const signature = problem.patternSignature || problem.text;
+        if (recentSignatures.length >= 2) {
+          const last1 = recentSignatures[recentSignatures.length - 1];
+          const last2 = recentSignatures[recentSignatures.length - 2];
+          if (last1 === last2 && signature === last1) continue;
+        }
+        if (recentSignatures.length >= 1) {
+          const last1 = recentSignatures[recentSignatures.length - 1];
+          if (signature === last1 && Math.random() < 0.75) continue;
+        }
+        return problem;
+      }
+      return makeProblem();
+    }
+
+    function buildRecordKey({ gameMode, operationType, timeLimit, targetCorrect, level }) {
+      return `${gameMode}_${operationType}_${timeLimit}_${targetCorrect}_${level}`;
+    }
+    function buildClearKey(operationType, level) { return `${operationType}_${level}`; }
+
+    function loadRecords() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.records) || "{}"); } catch { return {}; }
+    }
+    function saveRecords(records) { localStorage.setItem(STORAGE_KEYS.records, JSON.stringify(records)); }
+    function loadClears() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.clears) || "{}"); } catch { return {}; }
+    }
+    function saveClears(clears) { localStorage.setItem(STORAGE_KEYS.clears, JSON.stringify(clears)); }
+    function loadLastSession() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.last) || "null"); } catch { return null; }
+    }
+    function saveLastSession(correct, wrong, seconds) {
+      const data = { correct, wrong, seconds };
+      state.lastSession = data;
+      localStorage.setItem(STORAGE_KEYS.last, JSON.stringify(data));
+    }
+    function clearAllSavedData() {
+      localStorage.removeItem(STORAGE_KEYS.records);
+      localStorage.removeItem(STORAGE_KEYS.clears);
+      localStorage.removeItem(STORAGE_KEYS.last);
+    }
+
+    function playTone(type = "correct") {
+      if (!state.soundOn) return;
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) return;
+      const ctx = new AudioContextClass();
+      const oscillator = ctx.createOscillator();
+      const gain = ctx.createGain();
+      oscillator.connect(gain);
+      gain.connect(ctx.destination);
+      if (type === "correct") {
+        oscillator.frequency.setValueAtTime(660, ctx.currentTime);
+        oscillator.frequency.linearRampToValueAtTime(880, ctx.currentTime + 0.12);
+      } else if (type === "wrong") {
+        oscillator.frequency.setValueAtTime(280, ctx.currentTime);
+        oscillator.frequency.linearRampToValueAtTime(180, ctx.currentTime + 0.16);
+      } else if (type === "tap") {
+        oscillator.frequency.setValueAtTime(520, ctx.currentTime);
+        oscillator.frequency.linearRampToValueAtTime(560, ctx.currentTime + 0.06);
+      } else {
+        oscillator.frequency.setValueAtTime(520, ctx.currentTime);
+        oscillator.frequency.linearRampToValueAtTime(700, ctx.currentTime + 0.2);
+      }
+      gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(type === "tap" ? 0.025 : 0.05, ctx.currentTime + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + (type === "tap" ? 0.08 : 0.22));
+      oscillator.start(ctx.currentTime);
+      oscillator.stop(ctx.currentTime + (type === "tap" ? 0.09 : 0.24));
+    }
+
+    function displayAnswer(sign, digits) {
+      if (!sign) return "符号を選んでください";
+      if (!digits) return sign;
+      return `${sign}${digits}`;
+    }
+    function parseAnswer(sign, digits) {
+      if (!sign || digits === "") return null;
+      const number = Number(digits);
+      return sign === "-" ? -number : number;
+    }
+
+    function getIsSpecial() { return state.level === 4; }
+    function getEffectiveMode() { return getIsSpecial() ? "sudden" : state.gameMode; }
+    function getAccuracy() {
+      const total = state.correct + state.wrong;
+      return total === 0 ? 0 : Math.round((state.correct / total) * 100);
+    }
+    function getProgress() {
+      if (getIsSpecial()) return 0;
+      if (state.gameMode === "time") return ((state.timeLimit - state.remaining) / state.timeLimit) * 100;
+      return (state.correct / state.targetCorrect) * 100;
+    }
+    function getCurrentRecordKey() {
+      return buildRecordKey({
+        gameMode: getEffectiveMode(),
+        operationType: state.operationType,
+        timeLimit: state.timeLimit,
+        targetCorrect: state.targetCorrect,
+        level: state.level,
+      });
+    }
+    function getCurrentRecord() {
+      return state.records[getCurrentRecordKey()];
+    }
+    function getSpecialUnlocked() {
+      return [1,2,3].every(lv => state.clears[buildClearKey("powermix", lv)]);
+    }
+
+    function updateBestRecord(finalCorrect, finalWrong, finalElapsed) {
+      const key = getCurrentRecordKey();
+      const nextRecords = { ...state.records };
+      const effectiveMode = getEffectiveMode();
+      let isNew = false;
+      if (effectiveMode === "time") {
+        const best = nextRecords[key];
+        if (!best || finalCorrect > best.bestCorrect || (finalCorrect === best.bestCorrect && finalWrong < best.wrong)) {
+          nextRecords[key] = {
+            mode: "time",
+            bestCorrect: finalCorrect,
+            wrong: finalWrong,
+            level: state.level,
+            operationType: state.operationType,
+            timeLimit: state.timeLimit,
+          };
+          isNew = true;
+        }
+      } else if (effectiveMode === "target") {
+        const best = nextRecords[key];
+        if (!best || finalElapsed < best.bestSeconds || (finalElapsed === best.bestSeconds && finalWrong < best.wrong)) {
+          nextRecords[key] = {
+            mode: "target",
+            bestSeconds: finalElapsed,
+            wrong: finalWrong,
+            level: state.level,
+            operationType: state.operationType,
+            targetCorrect: state.targetCorrect,
+          };
+          isNew = true;
+        }
+      } else {
+        const best = nextRecords[key];
+        if (!best || finalCorrect > best.bestCorrect) {
+          nextRecords[key] = {
+            mode: "sudden",
+            bestCorrect: finalCorrect,
+            wrong: finalWrong,
+            level: state.level,
+            operationType: state.operationType,
+          };
+          isNew = true;
+        }
+      }
+      state.records = nextRecords;
+      saveRecords(nextRecords);
+      state.newRecord = isNew;
+      if (isNew) playTone("finish");
+    }
+
+    function markLevelClear(finalCorrect, finalElapsed) {
+      if (state.gameMode !== "target") return;
+      if (state.operationType !== "powermix") return;
+      if (![1,2,3].includes(state.level)) return;
+      const rule = SPECIAL_UNLOCK_RULES[state.level];
+      if (!rule) return;
+      if (finalCorrect < rule.targetCorrect) return;
+      if (finalElapsed > rule.maxSeconds) return;
+      state.clears[buildClearKey("powermix", state.level)] = true;
+      saveClears(state.clears);
+    }
+
+    function finishTargetMode(nextCorrect, nextWrong) {
+      state.running = false;
+      state.finished = true;
+      state.message = `クリア！ ${state.targetCorrect}問正解まで ${state.elapsed} 秒でした。`;
+      updateBestRecord(nextCorrect, nextWrong, state.elapsed);
+      saveLastSession(nextCorrect, nextWrong, state.elapsed);
+      markLevelClear(nextCorrect, state.elapsed);
+      playTone("finish");
+      render();
+    }
+
+    function finishSuddenDeath(finalCorrect, finalWrong) {
+      state.running = false;
+      state.finished = true;
+      state.message = `サドンデス終了！ ${finalCorrect}問連続正解`;
+      updateBestRecord(finalCorrect, finalWrong, state.elapsed);
+      saveLastSession(finalCorrect, finalWrong, state.elapsed);
+      playTone("wrong");
+      render();
+    }
+
+    function makeNextProblem(type, level, incomingSignature) {
+      const nextRecent = incomingSignature ? [...state.recentPatterns, incomingSignature].slice(-2) : state.recentPatterns;
+      state.recentPatterns = nextRecent;
+      return generateProblem(type, level, nextRecent);
+    }
+
+    function resetGame() {
+      stopTimer();
+      state.running = false;
+      state.finished = false;
+      state.newRecord = false;
+      state.recentPatterns = [];
+      state.problem = generateProblem(state.operationType, state.level, []);
+      state.answerSign = "";
+      state.answerDigits = "";
+      state.remaining = state.timeLimit;
+      state.elapsed = 0;
+      state.correct = 0;
+      state.wrong = 0;
+      state.combo = 0;
+      state.bestCombo = 0;
+      state.history = [];
+      state.message = "スタートすると問題が出ます";
+      render();
+    }
+
+    function resetAllSavedData() {
+      if (state.running) return;
+      clearAllSavedData();
+      state.records = {};
+      state.clears = {};
+      state.lastSession = null;
+      state.newRecord = false;
+      state.level = 1;
+      state.recentPatterns = [];
+      state.finished = false;
+      state.problem = generateProblem(state.operationType, 1, []);
+      state.message = "保存記録をすべてリセットしました";
+      render();
+    }
+
+    function startGame() {
+      stopTimer();
+      state.running = true;
+      state.finished = false;
+      state.newRecord = false;
+      state.recentPatterns = [];
+      state.answerSign = "";
+      state.answerDigits = "";
+      state.problem = generateProblem(state.operationType, state.level, []);
+      state.message = getIsSpecial() ? "まちがえるまで続きます" : "符号を選んでから、数字を入力してください";
+      if (!getIsSpecial() && state.gameMode === "time") state.remaining = state.timeLimit;
+      state.elapsed = 0;
+      state.correct = 0;
+      state.wrong = 0;
+      state.combo = 0;
+      state.bestCombo = 0;
+      state.history = [];
+      playTone("finish");
+      if (!getIsSpecial()) startTimer();
+      render();
+    }
+
+    function startTimer() {
+      stopTimer();
+      state.timer = setInterval(() => {
+        state.elapsed += 1;
+        if (state.gameMode === "time") {
+          if (state.remaining <= 1) {
+            state.remaining = 0;
+            stopTimer();
+            state.running = false;
+            state.finished = true;
+            state.message = "時間切れです。おつかれさまです。";
+            updateBestRecord(state.correct, state.wrong, state.elapsed);
+            saveLastSession(state.correct, state.wrong, state.elapsed);
+            playTone("finish");
+          } else {
+            state.remaining -= 1;
+          }
+        }
+        render();
+      }, 1000);
+    }
+
+    function stopTimer() {
+      if (state.timer) {
+        clearInterval(state.timer);
+        state.timer = null;
+      }
+    }
+
+    function submitCurrentAnswer() {
+      if (!state.running || state.finished) return;
+      const userAnswer = parseAnswer(state.answerSign, state.answerDigits);
+      if (userAnswer === null) return;
+      const problem = state.problem;
+      const isCorrect = userAnswer === problem.answer;
+      const currentSignature = problem.patternSignature || problem.text;
+
+      if (getIsSpecial()) {
+        if (isCorrect) {
+          state.correct += 1;
+          state.combo += 1;
+          if (state.combo > state.bestCombo) state.bestCombo = state.combo;
+          state.message = "正解！次の問題へ";
+          state.history = [{ ...problem, userAnswer, isCorrect: true }, ...state.history].slice(0, 8);
+          playTone("correct");
+          state.answerSign = "";
+          state.answerDigits = "";
+          state.problem = makeNextProblem(state.operationType, state.level, currentSignature);
+        } else {
+          const finalWrong = state.wrong + 1;
+          state.wrong = finalWrong;
+          state.combo = 0;
+          state.history = [{ ...problem, userAnswer, isCorrect: false }, ...state.history].slice(0, 8);
+          finishSuddenDeath(state.correct, finalWrong);
+          return;
+        }
+        render();
+        return;
+      }
+
+      if (isCorrect) {
+        state.correct += 1;
+        state.combo += 1;
+        if (state.combo > state.bestCombo) state.bestCombo = state.combo;
+        state.message = "正解！ いい感じです。";
+        state.history = [{ ...problem, userAnswer, isCorrect: true }, ...state.history].slice(0, 8);
+        playTone("correct");
+        if (state.gameMode === "target" && state.correct >= state.targetCorrect) {
+          state.answerSign = "";
+          state.answerDigits = "";
+          stopTimer();
+          finishTargetMode(state.correct, state.wrong);
+          return;
+        }
+      } else {
+        state.wrong += 1;
+        state.combo = 0;
+        state.message = `不正解。正解は ${problem.answer} です。`;
+        state.history = [{ ...problem, userAnswer, isCorrect: false }, ...state.history].slice(0, 8);
+        playTone("wrong");
+      }
+
+      state.answerSign = "";
+      state.answerDigits = "";
+      state.problem = makeNextProblem(state.operationType, state.level, currentSignature);
+      render();
+    }
+
+    function renderOpButtons() {
+      els.opButtons.innerHTML = Object.entries(OPERATIONS).map(([key, label]) => {
+        const active = state.operationType === key ? "active" : "";
+        return `<button class="btn ${active}" data-op="${key}">${label}</button>`;
+      }).join("");
+      els.opButtons.querySelectorAll("button").forEach(btn => {
+        btn.onclick = () => {
+          if (state.running) return;
+          state.operationType = btn.dataset.op;
+          state.level = 1;
+          state.finished = false;
+          state.newRecord = false;
+          state.recentPatterns = [];
+          state.problem = generateProblem(state.operationType, 1, []);
+          render();
+        };
+      });
+    }
+
+    function renderLevelButtons() {
+      const specialUnlocked = getSpecialUnlocked();
+      els.levelButtons.innerHTML = [1,2,3].map(lv => {
+        const active = state.level === lv ? "active" : "";
+        return `<button class="btn ${active}" data-level="${lv}">${LEVELS[lv]}</button>`;
+      }).join("") +
+      `<button class="btn ${state.level === 4 ? "active" : ""}" data-level="4" ${(!specialUnlocked || state.operationType !== "powermix") ? "disabled" : ""}>${specialUnlocked && state.operationType === "powermix" ? "✨ " : "🔒 "}${LEVELS[4]}</button>`;
+      els.levelButtons.querySelectorAll("button").forEach(btn => {
+        btn.onclick = () => {
+          if (state.running) return;
+          const lv = Number(btn.dataset.level);
+          if (lv === 4 && (!getSpecialUnlocked() || state.operationType !== "powermix")) return;
+          state.level = lv;
+          state.finished = false;
+          state.newRecord = false;
+          state.recentPatterns = [];
+          state.problem = generateProblem(state.operationType, lv, []);
+          render();
+        };
+      });
+    }
+
+    function renderHistory() {
+      if (!state.history.length) {
+        els.history.innerHTML = `<div class="note">まだ解答履歴はありません。</div>`;
+        return;
+      }
+      els.history.innerHTML = state.history.map(item => `
+        <div class="history-item">
+          <div class="left">${escapeHtml(item.text)} = ${item.userAnswer}</div>
+          <div class="tag ${item.isCorrect ? "ok" : "ng"}">${item.isCorrect ? "正解" : "不正解"}</div>
+        </div>
+      `).join("");
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;");
+    }
+
+    function render() {
+      const isSpecial = getIsSpecial();
+      const effectiveMode = getEffectiveMode();
+      const accuracy = getAccuracy();
+      const progress = Math.max(0, Math.min(100, getProgress()));
+      const currentRecord = getCurrentRecord();
+
+      els.soundToggle.textContent = state.soundOn ? "音あり" : "音なし";
+      els.soundToggle.className = `btn ${state.soundOn ? "primary" : ""}`;
+      els.playerName.value = state.playerName;
+      els.playerName.disabled = state.running;
+
+      document.querySelectorAll(".mode-btn").forEach(btn => btn.classList.toggle("active", btn.dataset.mode === state.gameMode));
+      document.querySelectorAll(".time-btn").forEach(btn => btn.classList.toggle("active", Number(btn.dataset.time) === state.timeLimit));
+      document.querySelectorAll(".target-btn").forEach(btn => btn.classList.toggle("active", Number(btn.dataset.target) === state.targetCorrect));
+
+      renderOpButtons();
+      renderLevelButtons();
+
+      els.modeSection.classList.toggle("hidden", isSpecial);
+      els.specialInfo.classList.toggle("hidden", !isSpecial);
+      els.timeSection.classList.toggle("hidden", isSpecial || state.gameMode !== "time");
+      els.targetSection.classList.toggle("hidden", isSpecial || state.gameMode !== "target");
+      els.progressArea.classList.toggle("hidden", isSpecial);
+      els.specialChip.classList.toggle("hidden", !isSpecial);
+
+      els.statMode.textContent = GAME_MODES[effectiveMode];
+      els.statTime.textContent = isSpecial ? "--" : state.gameMode === "time" ? `${state.remaining}秒` : `${state.elapsed}秒`;
+      els.statCorrect.textContent = `${state.correct}問`;
+      els.statAccuracy.textContent = `${accuracy}%`;
+      els.statCombo.textContent = `${state.combo}`;
+      els.progressText.textContent = `${Math.round(progress)}%`;
+      els.progressBar.style.width = `${progress}%`;
+      els.levelChip.textContent = LEVELS[state.level];
+      els.problemText.innerHTML = state.problem ? state.problem.display : "--";
+      els.answerScreen.textContent = displayAnswer(state.answerSign, state.answerDigits);
+      els.message.textContent = state.message;
+      els.comboBanner.classList.toggle("hidden", state.combo < 3);
+      if (state.combo >= 3) els.comboBanner.textContent = `🔥 ${state.combo}連続正解！`;
+      els.bestComboText.textContent = `${state.bestCombo}`;
+
+      Array.from(document.querySelectorAll("button")).forEach(btn => {
+        if (btn.classList.contains("num-btn") || btn.id === "backBtn" || btn.id === "clearBtn" || btn.id === "submitBtn" || btn.id === "signPlus" || btn.id === "signMinus") {
+          // handled below
+        }
+      });
+      const disableDigits = !state.running || state.finished || !state.answerSign;
+      document.querySelectorAll(".num-btn").forEach(btn => btn.disabled = disableDigits);
+      els.backBtn.disabled = !state.running || state.finished || !state.answerSign;
+      els.clearBtn.disabled = !state.running || state.finished || !state.answerSign;
+      els.submitBtn.disabled = !state.running || state.finished || parseAnswer(state.answerSign, state.answerDigits) === null;
+      els.signPlus.disabled = !state.running || state.finished;
+      els.signMinus.disabled = !state.running || state.finished;
+      els.signPlus.classList.toggle("active", state.answerSign === "+");
+      els.signMinus.classList.toggle("active", state.answerSign === "-");
+      els.clearSaveBtn.disabled = state.running;
+
+      let recordText = "まだこの条件の記録はありません。";
+      if (currentRecord) {
+        if (effectiveMode === "time") {
+          recordText = `自己ベスト：${state.timeLimit}秒で ${currentRecord.bestCorrect} 問正解`;
+        } else if (effectiveMode === "target") {
+          recordText = `自己ベスト：${state.targetCorrect}問正解まで ${currentRecord.bestSeconds} 秒`;
+        } else {
+          recordText = `自己ベスト：サドンデスで ${currentRecord.bestCorrect} 問連続正解`;
+        }
+      }
+      els.recordText.textContent = recordText;
+      renderHistory();
+
+      const summaryText = !state.finished ? "" : effectiveMode === "time"
+        ? `${state.timeLimit}秒で ${state.correct}問正解 / 正答率 ${accuracy}%`
+        : effectiveMode === "target"
+          ? `${state.targetCorrect}問正解まで ${state.elapsed}秒 / ミス ${state.wrong}回`
+          : `${state.correct}問連続正解 / サドンデス終了`;
+      els.resultStack.classList.toggle("hidden", !state.finished || !summaryText);
+      els.summaryBanner.textContent = summaryText;
+      if (state.lastSession) {
+        els.lastBanner.classList.remove("hidden");
+        els.lastBanner.textContent = `前回：${state.lastSession.correct}問 / ミス${state.lastSession.wrong}回`;
+      } else {
+        els.lastBanner.classList.add("hidden");
+      }
+      els.recordBanner.classList.toggle("hidden", !state.newRecord);
+    }
+
+    function bindEvents() {
+      els.soundToggle.onclick = () => { state.soundOn = !state.soundOn; render(); };
+      els.playerName.oninput = (e) => { if (state.running) return; state.playerName = e.target.value; };
+      document.querySelectorAll(".mode-btn").forEach(btn => {
+        btn.onclick = () => {
+          if (state.running) return;
+          state.gameMode = btn.dataset.mode;
+          state.finished = false;
+          state.newRecord = false;
+          render();
+        };
+      });
+      document.querySelectorAll(".time-btn").forEach(btn => btn.onclick = () => {
+        if (state.running) return;
+        state.timeLimit = Number(btn.dataset.time);
+        state.remaining = state.timeLimit;
+        state.finished = false;
+        state.newRecord = false;
+        render();
+      });
+      document.querySelectorAll(".target-btn").forEach(btn => btn.onclick = () => {
+        if (state.running) return;
+        state.targetCorrect = Number(btn.dataset.target);
+        state.finished = false;
+        state.newRecord = false;
+        render();
+      });
+      els.startBtn.onclick = startGame;
+      els.resetBtn.onclick = resetGame;
+      els.clearSaveBtn.onclick = resetAllSavedData;
+      els.signPlus.onclick = () => { if (!state.running || state.finished) return; state.answerSign = "+"; playTone("tap"); render(); };
+      els.signMinus.onclick = () => { if (!state.running || state.finished) return; state.answerSign = "-"; playTone("tap"); render(); };
+      document.querySelectorAll(".num-btn").forEach(btn => btn.onclick = () => {
+        if (!state.running || state.finished || !state.answerSign) return;
+        if (state.answerDigits.length >= 4) return;
+        const digit = btn.dataset.digit;
+        state.answerDigits = state.answerDigits === "0" ? digit : `${state.answerDigits}${digit}`;
+        playTone("tap");
+        render();
+      });
+      els.backBtn.onclick = () => {
+        if (!state.running || state.finished) return;
+        if (state.answerDigits.length > 0) state.answerDigits = state.answerDigits.slice(0, -1);
+        else state.answerSign = "";
+        playTone("tap");
+        render();
+      };
+      els.clearBtn.onclick = () => {
+        if (!state.running || state.finished) return;
+        state.answerSign = "";
+        state.answerDigits = "";
+        playTone("tap");
+        render();
+      };
+      els.submitBtn.onclick = submitCurrentAnswer;
+    }
+
+    bindEvents();
+    render();
+  </script>
+</body>
+</html>
