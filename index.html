@@ -399,13 +399,6 @@
       color: #991b1b;
     }
 
-    .special-box {
-      border: 1px solid var(--line);
-      background: var(--soft);
-      border-radius: 18px;
-      padding: 16px;
-    }
-
     .finish-actions {
       margin-top: 16px;
       display: grid;
@@ -627,10 +620,11 @@
       <div class="card left-panel-sticky">
         <div class="card-header"></div>
         <div class="card-body stack">
+          <!-- ★ モード選択を Score Attack と サドンデス に変更 -->
           <div id="modeSection" class="row">
             <div class="grid-2">
               <button class="btn mode-btn active" data-mode="time">Score Attack</button>
-              <button class="btn mode-btn" data-mode="target">Time Attack</button>
+              <button class="btn mode-btn" data-mode="sudden">Sudden Death</button>
             </div>
           </div>
 
@@ -644,24 +638,15 @@
 
           <div id="specialInfo" class="special-box hidden">
             <div class="label">スペシャルモード</div>
-            <div style="margin-top:8px;font-size:24px;font-weight:800;">サドンデス</div>
-            <div style="margin-top:6px;color:var(--muted);font-size:14px;">四則混合だけのサドンデスです</div>
+            <div style="margin-top:8px;font-size:24px;font-weight:800;">Sudden Death</div>
+            <div style="margin-top:6px;color:var(--muted);font-size:14px;">四則混合のSudden Deathモードです</div>
           </div>
 
           <div id="timeSection" class="row">
             <div class="grid-3">
-              <button class="btn time-btn active" data-time="30">30秒</button>
-              <button class="btn time-btn" data-time="60">60秒</button>
-              <button class="btn time-btn" data-time="90">90秒</button>
-            </div>
-          </div>
-
-          <div id="targetSection" class="row hidden">
-            <div class="label">目標正解数</div>
-            <div class="grid-3">
-              <button class="btn target-btn active" data-target="10">10問</button>
-              <button class="btn target-btn" data-target="15">15問</button>
-              <button class="btn target-btn" data-target="20">20問</button>
+              <button class="btn time-btn active" data-time="60">1分</button>
+              <button class="btn time-btn" data-time="120">2分</button>
+              <button class="btn time-btn" data-time="180">3分</button>
             </div>
           </div>
 
@@ -716,7 +701,7 @@
             </div>
 
             <div class="mini-card">
-              <div class="mini-title">まちがえた問題</div>
+              <div class="mini-title">今回まちがえた問題</div>
               <div id="history" class="history"><div class="note">まだ間違えた問題はありません。</div></div>
             </div>
           </div>
@@ -737,10 +722,10 @@
       powermix: "四則",
     };
 
+    // ★ モードからTime Attack(target)を削除し、サドンデスを追加
     const GAME_MODES = {
       time: "Score Attack",
-      target: "Time Attack",
-      sudden: "サドンデス",
+      sudden: "Sudden Death",
     };
 
     const LEVELS = {
@@ -748,12 +733,6 @@
       2: "レベル2",
       3: "レベル3",
       4: "スペシャル",
-    };
-
-    const SPECIAL_UNLOCK_RULES = {
-      1: { targetCorrect: 10, maxSeconds: 20 },
-      2: { targetCorrect: 10, maxSeconds: 30 },
-      3: { targetCorrect: 10, maxSeconds: 40 },
     };
 
     const STORAGE_KEYS = {
@@ -766,8 +745,7 @@
       gameMode: "time",
       operationType: "addsub",
       level: 1,
-      timeLimit: 30,
-      targetCorrect: 10,
+      timeLimit: 60,
       running: false,
       finished: false,
       recentPatterns: [],
@@ -775,7 +753,7 @@
       problem: null,
       answerSign: "",
       answerDigits: "",
-      remaining: 30,
+      remaining: 60,
       elapsed: 0,
       correct: 0,
       wrong: 0,
@@ -796,8 +774,6 @@
       soundToggle: document.getElementById("soundToggle"),
       modeSection: document.getElementById("modeSection"),
       timeSection: document.getElementById("timeSection"),
-      targetSection: document.getElementById("targetSection"),
-      specialInfo: document.getElementById("specialInfo"),
       opButtons: document.getElementById("opButtons"),
       levelButtons: document.getElementById("levelButtons"),
       startBtn: document.getElementById("startBtn"),
@@ -823,128 +799,71 @@
       scoreSummary: document.getElementById("scoreSummary"),
     };
 
-    function randInt(min, max) {
-      return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
-
-    function randNo01(min, max) {
-      let n = 0;
-      do {
-        n = randInt(min, max);
-      } while (n === 0 || n === 1 || n === -1);
-      return n;
-    }
-
-    function choice(arr) {
-      return arr[randInt(0, arr.length - 1)];
-    }
-
-    function getTermCount(level) {
-      return level === 1 ? 2 : level === 2 ? 3 : level === 3 ? 4 : 5;
-    }
-
-    function formatSignedNumber(n) {
-      return n < 0 ? `(${n})` : `${n}`;
-    }
-
-    function powerText(base, exponent) {
-      if (base >= 0) return `${base}^${exponent}`;
-      return `(${base})^${exponent}`;
-    }
-
+    function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+    function randNo01(min, max) { let n = 0; do { n = randInt(min, max); } while (n === 0 || n === 1 || n === -1); return n; }
+    function choice(arr) { return arr[randInt(0, arr.length - 1)]; }
+    function getTermCount(level) { return level === 1 ? 2 : level === 2 ? 3 : level === 3 ? 4 : 5; }
+    function formatSignedNumber(n) { return n < 0 ? `(${n})` : `${n}`; }
+    function powerText(base, exponent) { if (base >= 0) return `${base}^${exponent}`; return `(${base})^${exponent}`; }
     function powerHTML(base, exponent) {
       if (base >= 0) return `<span>${base}<sup style="font-size:.55em;position:relative;top:-0.55em;">${exponent}</sup></span>`;
       return `<span>(${base})<sup style="font-size:.55em;position:relative;top:-0.55em;">${exponent}</sup></span>`;
     }
-
-    function plainTerm(value) {
-      return { text: formatSignedNumber(value), display: formatSignedNumber(value), value };
-    }
-
-    function powerTerm(base, exponent) {
-      return { text: powerText(base, exponent), display: powerHTML(base, exponent), value: base ** exponent };
-    }
-
+    function plainTerm(value) { return { text: formatSignedNumber(value), display: formatSignedNumber(value), value }; }
+    function powerTerm(base, exponent) { return { text: powerText(base, exponent), display: powerHTML(base, exponent), value: base ** exponent }; }
     function powerTermNoParen(base, exponent) {
       const abs = Math.abs(base);
-      return {
-        text: `-${abs}^${exponent}`,
-        display: `<span>-${abs}<sup style="font-size:.55em;position:relative;top:-0.55em;">${exponent}</sup></span>`,
-        value: -(abs ** exponent)
-      };
+      return { text: `-${abs}^${exponent}`, display: `<span>-${abs}<sup style="font-size:.55em;position:relative;top:-0.55em;">${exponent}</sup></span>`, value: -(abs ** exponent) };
     }
-
     function createPowerTerm() {
-      const base = choice([-4, -3, -2, 2, 3, 4]);
-      const exponent = choice([2, 3]);
+      const base = choice([-4, -3, -2, 2, 3, 4]); const exponent = choice([2, 3]);
       if (base < 0 && Math.random() < 0.33) return powerTermNoParen(base, exponent);
       return powerTerm(base, exponent);
     }
-
     function buildExpression(terms, ops) {
-      let text = terms[0].text;
-      let display = terms[0].display;
-      for (let i = 1; i < terms.length; i++) {
-        text += ` ${ops[i - 1]} ${terms[i].text}`;
-        display += ` ${ops[i - 1]} ${terms[i].display}`;
-      }
+      let text = terms[0].text; let display = terms[0].display;
+      for (let i = 1; i < terms.length; i++) { text += ` ${ops[i - 1]} ${terms[i].text}`; display += ` ${ops[i - 1]} ${terms[i].display}`; }
       return { text, display };
     }
 
     function createAddSubMixedProblem(level) {
       const count = getTermCount(level);
       let nums;
-      // 少なくとも1つは負の数を含める
-      do {
-        nums = Array.from({ length: count }, () => randNo01(-18, 18));
-      } while (nums.every(n => n > 0));
-
+      do { nums = Array.from({ length: count }, () => randNo01(-18, 18)); } while (nums.every(n => n > 0));
       const ops = [];
       for (let i = 0; i < count - 1; i++) {
-        const next = nums[i + 1];
-        ops.push(next < 0 && Math.random() < 0.65 ? "-" : choice(["+", "-"]));
+        const next = nums[i + 1]; ops.push(next < 0 && Math.random() < 0.65 ? "-" : choice(["+", "-"]));
       }
-
       let answer = nums[0];
-      for (let i = 1; i < count; i++) {
-        answer = ops[i - 1] === "+" ? answer + nums[i] : answer - nums[i];
-      }
-
-      const terms = nums.map(plainTerm);
-      const expression = buildExpression(terms, ops);
+      for (let i = 1; i < count; i++) { answer = ops[i - 1] === "+" ? answer + nums[i] : answer - nums[i]; }
+      const terms = nums.map(plainTerm); const expression = buildExpression(terms, ops);
       return { ...expression, answer, patternSignature: ops.join("") };
     }
 
     function createMulDivMixedProblem(level, includePowers = true) {
       const count = getTermCount(level);
-      let result;
-
       for (let attempt = 0; attempt < 100; attempt++) {
         const start = randNo01(-10, 10);
         const ops = Array.from({ length: count - 1 }, () => choice(["×", "÷"]));
         const terms = [plainTerm(start)];
         let current = start;
-
         for (let i = 0; i < ops.length; i++) {
           if (ops[i] === "×") {
             const usePower = includePowers && Math.random() < 0.5;
             if (usePower) {
-              let p = createPowerTerm();
-              terms.push(p);
-              current *= p.value;
+              let p = createPowerTerm(); terms.push(p); current *= p.value;
             } else {
-              const nextValue = randNo01(-9, 9);
-              terms.push(plainTerm(nextValue));
-              current *= nextValue;
+              const nextValue = randNo01(-9, 9); terms.push(plainTerm(nextValue)); current *= nextValue;
             }
           } else {
             const divisors = [-9,-8,-7,-6,-5,-4,-3,-2,2,3,4,5,6,7,8,9].filter(d => current % d === 0);
-            const picked = divisors.length ? choice(divisors) : 2;
-            terms.push(plainTerm(picked));
-            current /= picked;
+            if (divisors.length > 0) {
+              const picked = choice(divisors); terms.push(plainTerm(picked)); current /= picked;
+            } else {
+              ops[i] = "×"; const nextValue = randNo01(-9, 9); terms.push(plainTerm(nextValue)); current *= nextValue;
+            }
           }
         }
-        
         if (terms.some(t => t.value < 0)) {
           const expression = buildExpression(terms, ops);
           return { ...expression, answer: current, patternSignature: ops.join("") };
@@ -956,32 +875,27 @@
     function createPowerMixedProblem(level) {
       for (let attempt = 0; attempt < 100; attempt++) {
         const count = getTermCount(level);
-        function createFactor() {
-          return Math.random() < 0.55 ? createPowerTerm() : plainTerm(randNo01(-6, 6));
-        }
-
+        function createFactor() { return Math.random() < 0.55 ? createPowerTerm() : plainTerm(randNo01(-6, 6)); }
         function createMulDivChain(len) {
-          const terms = [createFactor()];
-          const ops = [];
-          let val = terms[0].value;
+          const terms = [createFactor()]; const ops = []; let val = terms[0].value;
           for (let i = 1; i < len; i++) {
             const op = choice(["×", "÷"]);
             if (op === "×") {
-              const f = createFactor();
-              terms.push(f); ops.push("×"); val *= f.value;
+              const f = createFactor(); terms.push(f); ops.push("×"); val *= f.value;
             } else {
               const divs = [2,3,4,5,-2,-3].filter(d => val % d === 0);
-              const dVal = divs.length ? choice(divs) : 2;
-              terms.push(plainTerm(dVal)); ops.push("÷"); val /= dVal;
+              if (divs.length > 0) {
+                const dVal = choice(divs); terms.push(plainTerm(dVal)); ops.push("÷"); val /= dVal;
+              } else {
+                const f = createFactor(); terms.push(f); ops.push("×"); val *= f.value;
+              }
             }
           }
           return { terms, ops, value: val };
         }
-
         const groups = [createMulDivChain(2), createMulDivChain(count - 2)];
         const groupOp = choice(["+", "-"]);
         let ans = groupOp === "+" ? groups[0].value + groups[1].value : groups[0].value - groups[1].value;
-        
         let allTerms = [...groups[0].terms, ...groups[1].terms];
         if (allTerms.some(t => t.value < 0)) {
           const allOps = [...groups[0].ops, groupOp, ...groups[1].ops];
@@ -999,16 +913,10 @@
     }
 
     function generateProblem(type, level, recentSignatures = [], recentAnswers = []) {
-      const creators = {
-        addsub: () => createAddSubMixedProblem(level),
-        muldiv: () => createMulDivMixedProblem(level, true),
-        powermix: () => createPowerMixedProblem(level),
-      };
-
+      const creators = { addsub: () => createAddSubMixedProblem(level), muldiv: () => createMulDivMixedProblem(level, true), powermix: () => createPowerMixedProblem(level) };
       const makeProblem = creators[type] || creators.addsub;
       for (let attempt = 0; attempt < 30; attempt++) {
-        const problem = makeProblem();
-        const signature = problem.patternSignature || problem.text;
+        const problem = makeProblem(); const signature = problem.patternSignature || problem.text;
         if (recentSignatures.includes(signature)) continue;
         if (isTooEasyAnswer(problem.answer, type, level)) continue;
         if (recentAnswers.includes(problem.answer)) continue;
@@ -1017,217 +925,127 @@
       return makeProblem();
     }
 
-    function buildRecordKey({ gameMode, operationType, timeLimit, targetCorrect, level }) {
-      return `${gameMode}_${operationType}_${timeLimit}_${targetCorrect}_${level}`;
+    function buildRecordKey({ gameMode, operationType, timeLimit, level }) {
+      return `${gameMode}_${operationType}_${timeLimit}_${level}`;
     }
 
-    function buildClearKey(operationType, level) {
-      return `${operationType}_${level}`;
-    }
-
+    function buildClearKey(operationType, level) { return `${operationType}_${level}`; }
     function loadRecords() { try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.records) || "{}"); } catch { return {}; } }
     function saveRecords(records) { localStorage.setItem(STORAGE_KEYS.records, JSON.stringify(records)); }
     function loadClears() { try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.clears) || "{}"); } catch { return {}; } }
     function saveClears(clears) { localStorage.setItem(STORAGE_KEYS.clears, JSON.stringify(clears)); }
     function loadLastSession() { try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.last) || "null"); } catch { return null; } }
     function saveLastSession(correct, wrong, seconds) {
-      const data = { correct, wrong, seconds };
-      state.lastSession = data;
-      localStorage.setItem(STORAGE_KEYS.last, JSON.stringify(data));
+      const data = { correct, wrong, seconds }; state.lastSession = data; localStorage.setItem(STORAGE_KEYS.last, JSON.stringify(data));
     }
 
+    /* === 全画面表示の制御 === */
+    function requestFullScreen() {
+      const docEl = document.documentElement;
+      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        if (docEl.requestFullscreen) {
+          docEl.requestFullscreen().catch(err => console.log(err));
+        } else if (docEl.webkitRequestFullscreen) { /* Safari用 */
+          docEl.webkitRequestFullscreen();
+        }
+      }
+    }
 
-    /* ==============================================================
-       ★ BGMと効果音のシステム (Web Audio API)
-    ============================================================== */
-    let bgmCtx = null;
-    let bgmInterval = null;
-    let bgmStep = 0;
+    function exitFullScreen() {
+      if (document.fullscreenElement || document.webkitFullscreenElement) {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) { /* Safari用 */
+          document.webkitExitFullscreen();
+        }
+      }
+    }
 
-    // 元気でテンポの良い8bit風メロディ（ハ長調のチップチューン風）
-    const BGM_MELODY = [
-      72,-1,76,72, 79,-1,76,-1, 72,76,79,76, 84,-1,79,-1,
-      69,-1,72,69, 76,-1,72,-1, 69,72,76,72, 81,-1,76,-1,
-      67,-1,71,67, 74,-1,71,-1, 67,71,74,71, 79,-1,74,-1,
-      72,-1,76,72, 79,-1,76,-1, 84,84,84,-1, 72,-1,-1,-1
-    ];
-    const BGM_BASS = [
-      48,-1,48,-1, 48,-1,48,-1, 48,-1,48,-1, 48,55,48,55,
-      45,-1,45,-1, 45,-1,45,-1, 45,-1,45,-1, 45,52,45,52,
-      43,-1,43,-1, 43,-1,43,-1, 43,-1,43,-1, 43,50,43,50,
-      48,-1,48,-1, 48,-1,48,-1, 48,48,48,-1, 48,-1,-1,-1
-    ];
-
+    /* === BGM・効果音 === */
+    let bgmCtx = null; let bgmInterval = null; let bgmStep = 0;
+    const BGM_MELODY = [ 72,-1,76,72, 79,-1,76,-1, 72,76,79,76, 84,-1,79,-1, 69,-1,72,69, 76,-1,72,-1, 69,72,76,72, 81,-1,76,-1, 67,-1,71,67, 74,-1,71,-1, 67,71,74,71, 79,-1,74,-1, 72,-1,76,72, 79,-1,76,-1, 84,84,84,-1, 72,-1,-1,-1 ];
+    const BGM_BASS = [ 48,-1,48,-1, 48,-1,48,-1, 48,-1,48,-1, 48,55,48,55, 45,-1,45,-1, 45,-1,45,-1, 45,-1,45,-1, 45,52,45,52, 43,-1,43,-1, 43,-1,43,-1, 43,-1,43,-1, 43,50,43,50, 48,-1,48,-1, 48,-1,48,-1, 48,48,48,-1, 48,-1,-1,-1 ];
     function playBGMNote(note, type, vol, dur) {
       if (!bgmCtx) return;
-      const osc = bgmCtx.createOscillator();
-      const gain = bgmCtx.createGain();
-      osc.type = type;
-      osc.frequency.value = 440 * Math.pow(2, (note - 69) / 12);
-      osc.connect(gain);
-      gain.connect(bgmCtx.destination);
-      
-      gain.gain.setValueAtTime(0, bgmCtx.currentTime);
-      gain.gain.linearRampToValueAtTime(vol, bgmCtx.currentTime + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.001, bgmCtx.currentTime + dur);
-      
-      osc.start(bgmCtx.currentTime);
-      osc.stop(bgmCtx.currentTime + dur + 0.1);
+      const osc = bgmCtx.createOscillator(); const gain = bgmCtx.createGain();
+      osc.type = type; osc.frequency.value = 440 * Math.pow(2, (note - 69) / 12);
+      osc.connect(gain); gain.connect(bgmCtx.destination);
+      gain.gain.setValueAtTime(0, bgmCtx.currentTime); gain.gain.linearRampToValueAtTime(vol, bgmCtx.currentTime + 0.02); gain.gain.exponentialRampToValueAtTime(0.001, bgmCtx.currentTime + dur);
+      osc.start(bgmCtx.currentTime); osc.stop(bgmCtx.currentTime + dur + 0.1);
     }
-
     function startBGM() {
       if (!state.soundOn) return;
-      if (!bgmCtx) {
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        if (AudioContext) bgmCtx = new AudioContext();
-      }
+      if (!bgmCtx) { const AudioContext = window.AudioContext || window.webkitAudioContext; if (AudioContext) bgmCtx = new AudioContext(); }
       if (!bgmCtx) return;
       if (bgmCtx.state === 'suspended') bgmCtx.resume();
-      
       if (bgmInterval) return;
       bgmStep = 0;
-      
-      // 130ms ごとに音符を鳴らす（約115BPMの軽快なテンポ）
       bgmInterval = setInterval(() => {
         if (!state.soundOn || !state.running || state.finished) return;
-        
-        const m = BGM_MELODY[bgmStep % BGM_MELODY.length];
-        const b = BGM_BASS[bgmStep % BGM_BASS.length];
-        
-        if (m !== -1) playBGMNote(m, 'sine', 0.015, 0.15); // メロディはやわらかい音
-        if (b !== -1) playBGMNote(b, 'square', 0.012, 0.1); // ベースはファミコン風の矩形波
-        
+        const m = BGM_MELODY[bgmStep % BGM_MELODY.length]; const b = BGM_BASS[bgmStep % BGM_BASS.length];
+        if (m !== -1) playBGMNote(m, 'sine', 0.06, 0.15);
+        if (b !== -1) playBGMNote(b, 'square', 0.04, 0.1);
         bgmStep++;
       }, 130);
     }
-
-    function stopBGM() {
-      if (bgmInterval) {
-        clearInterval(bgmInterval);
-        bgmInterval = null;
-      }
-    }
+    function stopBGM() { if (bgmInterval) { clearInterval(bgmInterval); bgmInterval = null; } }
 
     function playTone(type = "correct", param = 0) {
       if (!state.soundOn) return;
       const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      const osc = ctx.createOscillator();
-      const g = ctx.createGain();
+      const osc = ctx.createOscillator(); const g = ctx.createGain();
       osc.connect(g); g.connect(ctx.destination);
-
       let duration = 0.24;
-
       if (type === "correct") {
-        // コンボが続くほど音が少しずつ高くなる演出
-        const baseFreq = 660 + Math.min(param * 30, 400);
-        const endFreq = 880 + Math.min(param * 40, 500);
-        osc.frequency.setValueAtTime(baseFreq, ctx.currentTime);
-        osc.frequency.linearRampToValueAtTime(endFreq, ctx.currentTime + 0.12);
-        g.gain.setValueAtTime(0.001, ctx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.05, ctx.currentTime + 0.01);
-        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.22);
-      } 
-      else if (type === "wrong") {
-        // 不正解音：少し焦りを生む低めのノコギリ波
-        osc.type = "sawtooth";
-        osc.frequency.setValueAtTime(150, ctx.currentTime);
-        osc.frequency.linearRampToValueAtTime(100, ctx.currentTime + 0.2);
-        g.gain.setValueAtTime(0.001, ctx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.05, ctx.currentTime + 0.01);
-        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.22);
-      } 
-      else if (type === "gameover") {
-        // サドンデス失敗時の重い終了音
-        osc.type = "square";
-        duration = 0.8;
-        osc.frequency.setValueAtTime(200, ctx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(50, ctx.currentTime + 0.6);
-        g.gain.setValueAtTime(0.001, ctx.currentTime);
-        g.gain.linearRampToValueAtTime(0.05, ctx.currentTime + 0.05);
-        g.gain.linearRampToValueAtTime(0.001, ctx.currentTime + 0.7);
+        const baseFreq = 660 + Math.min(param * 30, 400); const endFreq = 880 + Math.min(param * 40, 500);
+        osc.frequency.setValueAtTime(baseFreq, ctx.currentTime); osc.frequency.linearRampToValueAtTime(endFreq, ctx.currentTime + 0.12);
+        g.gain.setValueAtTime(0.001, ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.15, ctx.currentTime + 0.01); g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.22);
+      } else if (type === "wrong") {
+        osc.type = "sawtooth"; osc.frequency.setValueAtTime(150, ctx.currentTime); osc.frequency.linearRampToValueAtTime(100, ctx.currentTime + 0.2);
+        g.gain.setValueAtTime(0.001, ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.15, ctx.currentTime + 0.01); g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.22);
+      } else if (type === "gameover") {
+        osc.type = "square"; duration = 0.8;
+        osc.frequency.setValueAtTime(200, ctx.currentTime); osc.frequency.exponentialRampToValueAtTime(50, ctx.currentTime + 0.6);
+        g.gain.setValueAtTime(0.001, ctx.currentTime); g.gain.linearRampToValueAtTime(0.15, ctx.currentTime + 0.05); g.gain.linearRampToValueAtTime(0.001, ctx.currentTime + 0.7);
+      } else if (type === "tick") {
+        osc.type = "square"; duration = 0.1; osc.frequency.setValueAtTime(880, ctx.currentTime);
+        g.gain.setValueAtTime(0.001, ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.06, ctx.currentTime + 0.01); g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+      } else if (type === "timeup") {
+        osc.type = "sawtooth"; duration = 1.0; osc.frequency.setValueAtTime(440, ctx.currentTime); osc.frequency.linearRampToValueAtTime(400, ctx.currentTime + 0.8);
+        g.gain.setValueAtTime(0.001, ctx.currentTime); g.gain.linearRampToValueAtTime(0.15, ctx.currentTime + 0.1); g.gain.linearRampToValueAtTime(0.001, ctx.currentTime + 0.9);
+      } else if (type === "finish") {
+        duration = 0.4; osc.frequency.setValueAtTime(440, ctx.currentTime); osc.frequency.linearRampToValueAtTime(880, ctx.currentTime + 0.1);
+        osc.frequency.setValueAtTime(880, ctx.currentTime + 0.1); osc.frequency.linearRampToValueAtTime(1760, ctx.currentTime + 0.3);
+        g.gain.setValueAtTime(0.001, ctx.currentTime); g.gain.linearRampToValueAtTime(0.15, ctx.currentTime + 0.05); g.gain.linearRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+      } else {
+        duration = 0.1; osc.frequency.setValueAtTime(520, ctx.currentTime); osc.frequency.linearRampToValueAtTime(560, ctx.currentTime + 0.06);
+        g.gain.setValueAtTime(0.001, ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.08, ctx.currentTime + 0.01); g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
       }
-      else if (type === "tick") {
-        // カウントダウン音：残り10秒を切ったときの「ピッ」
-        osc.type = "square";
-        duration = 0.1;
-        osc.frequency.setValueAtTime(880, ctx.currentTime);
-        g.gain.setValueAtTime(0.001, ctx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.02, ctx.currentTime + 0.01);
-        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
-      }
-      else if (type === "timeup") {
-        // タイムアップ音：「ピーー」という終了のブザー
-        osc.type = "sawtooth";
-        duration = 1.0;
-        osc.frequency.setValueAtTime(440, ctx.currentTime);
-        osc.frequency.linearRampToValueAtTime(400, ctx.currentTime + 0.8);
-        g.gain.setValueAtTime(0.001, ctx.currentTime);
-        g.gain.linearRampToValueAtTime(0.05, ctx.currentTime + 0.1);
-        g.gain.linearRampToValueAtTime(0.001, ctx.currentTime + 0.9);
-      }
-      else if (type === "finish") {
-        // 目標達成時のクリア音（明るくピッチが上がる）
-        duration = 0.4;
-        osc.frequency.setValueAtTime(440, ctx.currentTime);
-        osc.frequency.linearRampToValueAtTime(880, ctx.currentTime + 0.1);
-        osc.frequency.setValueAtTime(880, ctx.currentTime + 0.1);
-        osc.frequency.linearRampToValueAtTime(1760, ctx.currentTime + 0.3);
-        g.gain.setValueAtTime(0.001, ctx.currentTime);
-        g.gain.linearRampToValueAtTime(0.05, ctx.currentTime + 0.05);
-        g.gain.linearRampToValueAtTime(0.001, ctx.currentTime + 0.35);
-      }
-      else {
-        // 通常のボタンタップ音
-        duration = 0.1;
-        osc.frequency.setValueAtTime(520, ctx.currentTime);
-        osc.frequency.linearRampToValueAtTime(560, ctx.currentTime + 0.06);
-        g.gain.setValueAtTime(0.001, ctx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.025, ctx.currentTime + 0.01);
-        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
-      }
-
-      osc.start(ctx.currentTime);
-      osc.stop(ctx.currentTime + duration);
-    }
-    // ==============================================================
-
-
-    function displayAnswer(sign, digits) {
-      if (!sign && !digits) return "答えを入力";
-      return `${sign}${digits}`;
+      osc.start(ctx.currentTime); osc.stop(ctx.currentTime + duration);
     }
 
-    function parseAnswer(sign, digits) {
-      if (digits === "") return null;
-      const num = Number(digits);
-      return sign === "-" ? -num : num;
+    function displayAnswer(sign, digits) { if (!sign && !digits) return "答えを入力"; return `${sign}${digits}`; }
+    function parseAnswer(sign, digits) { if (digits === "") return null; const num = Number(digits); return sign === "-" ? -num : num; }
+
+    function getCurrentRecordKey() { return buildRecordKey({ gameMode: state.gameMode, operationType: state.operationType, timeLimit: state.timeLimit, level: state.level }); }
+    
+    // ★ スペシャルレベル(Lv4)の解放条件：四則・レベル3の「サドンデス」で10問連続正解
+    function getSpecialUnlocked() { 
+      return state.clears[buildClearKey("powermix", 3)]; 
     }
 
-    function getIsSpecial() { return state.level === 4; }
-    function getEffectiveMode() { return getIsSpecial() ? "sudden" : state.gameMode; }
-    function getAccuracy() { const t = state.correct + state.wrong; return t === 0 ? 0 : Math.round((state.correct / t) * 100); }
-    function getCurrentRecordKey() { return buildRecordKey({ gameMode: getEffectiveMode(), operationType: state.operationType, timeLimit: state.timeLimit, targetCorrect: state.targetCorrect, level: state.level }); }
-    function getSpecialUnlocked() { return [1,2,3].every(lv => state.clears[buildClearKey("powermix", lv)]); }
-
-    function updateBestRecord(finalCorrect, finalWrong, finalElapsed) {
-      const key = getCurrentRecordKey();
-      const nextRecords = { ...state.records };
-      const mode = getEffectiveMode();
-      let isNew = false;
-      const best = nextRecords[key];
-      if (mode === "time") {
+    function updateBestRecord(finalCorrect, finalWrong) {
+      const key = getCurrentRecordKey(); const nextRecords = { ...state.records };
+      let isNew = false; const best = nextRecords[key];
+      if (state.gameMode === "time") {
         if (!best || finalCorrect > best.bestCorrect || (finalCorrect === best.bestCorrect && finalWrong < best.wrong)) {
-          nextRecords[key] = { mode, bestCorrect: finalCorrect, wrong: finalWrong, level: state.level, operationType: state.operationType, timeLimit: state.timeLimit };
-          isNew = true;
-        }
-      } else if (mode === "target") {
-        if (!best || finalElapsed < best.bestSeconds || (finalElapsed === best.bestSeconds && finalWrong < best.wrong)) {
-          nextRecords[key] = { mode, bestSeconds: finalElapsed, wrong: finalWrong, level: state.level, operationType: state.operationType, targetCorrect: state.targetCorrect };
+          nextRecords[key] = { mode: state.gameMode, bestCorrect: finalCorrect, wrong: finalWrong, level: state.level, operationType: state.operationType, timeLimit: state.timeLimit };
           isNew = true;
         }
       } else {
+        // サドンデス
         if (!best || finalCorrect > best.bestCorrect) {
-          nextRecords[key] = { mode, bestCorrect: finalCorrect, wrong: finalWrong, level: state.level, operationType: state.operationType };
+          nextRecords[key] = { mode: state.gameMode, bestCorrect: finalCorrect, wrong: finalWrong, level: state.level, operationType: state.operationType };
           isNew = true;
         }
       }
@@ -1238,23 +1056,23 @@
 
     function finishGame() {
       stopTimer(); stopBGM(); state.running = false; state.finished = true; state.message = "";
-      updateBestRecord(state.correct, state.wrong, state.elapsed);
+      updateBestRecord(state.correct, state.wrong);
       saveLastSession(state.correct, state.wrong, state.elapsed);
-      if (state.gameMode === "target" && state.operationType === "powermix" && [1,2,3].includes(state.level)) {
-        const rule = SPECIAL_UNLOCK_RULES[state.level];
-        if (state.correct >= rule.targetCorrect && state.elapsed <= rule.maxSeconds) {
-          state.clears[buildClearKey("powermix", state.level)] = true; saveClears(state.clears);
+      
+      // ★ 四則・レベル3のサドンデスで10問連続正解したらクリアフラグを立てる（スペシャル解放用）
+      if (state.gameMode === "sudden" && state.operationType === "powermix" && state.level === 3) {
+        if (state.correct >= 10) {
+          state.clears[buildClearKey("powermix", 3)] = true; saveClears(state.clears);
         }
       }
 
       if (state.gameMode === "time" && state.remaining === 0) {
         playTone("timeup");
-      } else if (state.wrong > 0 && getIsSpecial()) {
+      } else if (state.gameMode === "sudden" && state.wrong > 0) {
         playTone("gameover");
       } else {
         playTone("finish");
       }
-
       render(); updateFinalScore(); scrollToResultSection();
     }
 
@@ -1269,13 +1087,14 @@
     }
 
     function startGame() {
+      requestFullScreen(); // ★ ゲーム開始時に全画面表示にする
       stopTimer(); state.running = true; state.finished = false; state.newRecord = false;
       state.answerSign = ""; state.answerDigits = ""; state.elapsed = 0; state.correct = 0;
       state.wrong = 0; state.combo = 0; state.bestCombo = 0; state.history = [];
       state.problem = generateProblem(state.operationType, state.level, [], []);
-      if (!getIsSpecial() && state.gameMode === "time") state.remaining = state.timeLimit;
-      if (!getIsSpecial()) startTimer();
-      startBGM(); // ゲーム開始時にBGMを鳴らす
+      if (state.gameMode === "time") state.remaining = state.timeLimit;
+      startTimer();
+      startBGM();
       render();
     }
 
@@ -1286,11 +1105,7 @@
         if (state.gameMode === "time") {
           if (state.remaining <= 1) { state.remaining = 0; finishGame(); return; }
           state.remaining -= 1;
-
-          // 残り10秒以下でカウントダウン音
-          if (state.remaining > 0 && state.remaining <= 10) {
-            playTone("tick");
-          }
+          if (state.remaining > 0 && state.remaining <= 10) playTone("tick");
         }
         render();
       }, 1000);
@@ -1302,7 +1117,8 @@
       const userAns = parseAnswer(state.answerSign, state.answerDigits);
       if (userAns === null) return;
       const isCorrect = userAns === state.problem.answer;
-      if (getIsSpecial()) {
+      
+      if (state.gameMode === "sudden") {
         if (isCorrect) {
           state.correct++; state.combo++; if (state.combo > state.bestCombo) state.bestCombo = state.combo;
           state.history = [{ ...state.problem, userAns, isCorrect: true }, ...state.history].slice(0, 8);
@@ -1314,11 +1130,11 @@
           finishGame(); return;
         }
       } else {
+        // Score Attack
         if (isCorrect) {
           state.correct++; state.combo++; if (state.combo > state.bestCombo) state.bestCombo = state.combo;
           state.history = [{ ...state.problem, userAns, isCorrect: true }, ...state.history].slice(0, 8);
           playTone("correct", state.combo);
-          if (state.gameMode === "target" && state.correct >= state.targetCorrect) { finishGame(); return; }
         } else {
           state.wrong++; state.combo = 0;
           state.history = [{ ...state.problem, userAns, isCorrect: false }, ...state.history].slice(0, 8);
@@ -1359,12 +1175,9 @@
     }
 
     function updateFinalScore() {
-      const mode = getEffectiveMode();
       let html = '';
-      if (mode === 'time') {
+      if (state.gameMode === 'time') {
         html = `<div class="score-item"><div class="score-label">正解</div><div class="score-value">${state.correct}</div></div><div class="score-item"><div class="score-label">ミス</div><div class="score-value" style="color:#ef4444">${state.wrong}</div></div><div class="score-item"><div class="score-label">最大コンボ</div><div class="score-value">${state.bestCombo}</div></div>`;
-      } else if (mode === 'target') {
-        html = `<div class="score-item"><div class="score-label">タイム</div><div class="score-value">${state.elapsed}秒</div></div><div class="score-item"><div class="score-label">ミス</div><div class="score-value" style="color:#ef4444">${state.wrong}</div></div><div class="score-item"><div class="score-label">最大コンボ</div><div class="score-value">${state.bestCombo}</div></div>`;
       } else {
         html = `<div class="score-item"><div class="score-label">連続正解</div><div class="score-value">${state.correct}</div></div><div class="score-item"><div class="score-label">タイム</div><div class="score-value">${state.elapsed}秒</div></div>`;
       }
@@ -1386,13 +1199,16 @@
         const rs = grouped[gKey]; const first = rs[0];
         html += `<div><div style="font-size:15px; font-weight:900; color:var(--primary); margin-bottom:6px; border-bottom:1px solid var(--line); padding-bottom:4px;">${OPERATIONS[first.operationType]} / ${LEVELS[first.level]}</div><div style="display:grid; gap:6px;">`;
         rs.forEach(r => {
-          const isCurrent = state.operationType === r.operationType && state.level === r.level && ((state.gameMode === 'time' && state.timeLimit === r.timeLimit) || (state.gameMode === 'target' && state.targetCorrect === r.targetCorrect) || (state.level === 4));
+          const isCurrent = state.operationType === r.operationType && state.level === r.level && ((state.gameMode === 'time' && state.timeLimit === r.timeLimit) || (state.gameMode === 'sudden'));
           const bg = isCurrent ? 'rgba(59,130,246,0.15)' : 'var(--soft)';
           const border = isCurrent ? '1px solid var(--primary)' : '1px solid transparent';
           let cond = "", res = "";
-          if (r.mode === 'time') { cond = ` Score Attack (${r.timeLimit}秒)`; res = `${r.bestCorrect}問正解 <span style="font-size:13px; color:var(--danger); margin-left:6px; font-weight:600;">ミス${r.wrong}</span>`; }
-          else if (r.mode === 'target') { cond = ` Time Attack (${r.targetCorrect}問)`; res = `${r.bestSeconds}秒 <span style="font-size:13px; color:var(--danger); margin-left:6px; font-weight:600;">ミス${r.wrong}</span>`; }
-          else { cond = ` サドンデス`; res = `${r.bestCorrect}問連続正解`; }
+          if (r.mode === 'time') { 
+            const timeStr = r.timeLimit % 60 === 0 ? (r.timeLimit / 60) + "分" : r.timeLimit + "秒";
+            cond = ` Score Attack (${timeStr})`; 
+            res = `${r.bestCorrect}問正解 <span style="font-size:13px; color:var(--danger); margin-left:6px; font-weight:600;">ミス${r.wrong}</span>`; 
+          }
+          else { cond = ` Sudden Death`; res = `${r.bestCorrect}問連続正解`; }
           html += `<div style="font-size:16px; display:flex; justify-content:space-between; align-items:center; background:${bg}; border:${border}; padding:10px 14px; border-radius:12px;"><span style="font-size:13px; color:var(--muted);">${cond}</span><span style="font-weight:800;">${res}</span></div>`;
         });
         html += `</div></div>`;
@@ -1401,27 +1217,32 @@
     }
 
     function render() {
-      const isSpec = getIsSpecial();
       els.soundToggle.textContent = state.soundOn ? "🔊" : "🔇";
       els.soundToggle.className = `btn full sound-btn ${state.soundOn ? "primary" : ""}`;
       document.querySelectorAll(".mode-btn").forEach(b => b.classList.toggle("active", b.dataset.mode === state.gameMode));
       document.querySelectorAll(".time-btn").forEach(b => b.classList.toggle("active", Number(b.dataset.time) === state.timeLimit));
-      document.querySelectorAll(".target-btn").forEach(b => b.classList.toggle("active", Number(b.dataset.target) === state.targetCorrect));
-      els.modeSection.classList.toggle("hidden", isSpec);
-      els.timeSection.classList.toggle("hidden", isSpec || state.gameMode !== "time");
-      els.targetSection.classList.toggle("hidden", isSpec || state.gameMode !== "target");
-      els.specialInfo.classList.toggle("hidden", !isSpec);
+      
+      els.timeSection.classList.toggle("hidden", state.gameMode !== "time");
+      
       renderOpButtons(); renderLevelButtons();
-      els.progressArea.classList.toggle("hidden", isSpec);
-      if (!isSpec) {
-        if (state.gameMode === "time") {
-          els.progressLabel.textContent = "残り時間"; els.progressText.textContent = `${state.remaining}秒`;
-          els.progressBar.style.width = `${(state.remaining / state.timeLimit) * 100}%`;
-        } else {
-          els.progressLabel.textContent = "正解数"; els.progressText.textContent = `${state.correct} / ${state.targetCorrect}問`;
-          els.progressBar.style.width = `${Math.min(100, (state.correct / state.targetCorrect) * 100)}%`;
+      
+      if (state.gameMode === "time") {
+        els.progressArea.classList.remove("hidden");
+        els.progressLabel.textContent = "残り時間"; 
+        let remStr = `${state.remaining}秒`;
+        if (state.remaining >= 60) {
+          const m = Math.floor(state.remaining / 60); const s = state.remaining % 60;
+          remStr = s === 0 ? `${m}分` : `${m}分${s}秒`;
         }
+        els.progressText.textContent = remStr;
+        els.progressBar.style.width = `${(state.remaining / state.timeLimit) * 100}%`;
+      } else {
+        els.progressArea.classList.remove("hidden");
+        els.progressLabel.textContent = "連続正解"; 
+        els.progressText.textContent = `${state.correct}問`;
+        els.progressBar.style.width = `100%`; // サドンデス時はバーを常に満タンにしておく
       }
+      
       els.problemText.innerHTML = state.problem ? state.problem.display : "--";
       const ansDisp = displayAnswer(state.answerSign, state.answerDigits);
       els.answerScreen.textContent = ansDisp; els.answerScreen.classList.toggle("placeholder", ansDisp === "答えを入力");
@@ -1435,7 +1256,7 @@
       els.finishActions.classList.toggle("hidden", !state.finished);
       els.scoreSummary.classList.toggle("hidden", !state.finished);
       els.startBtn.disabled = state.running; els.clearSaveBtn.disabled = state.running;
-      document.querySelectorAll(".mode-btn, .time-btn, .target-btn").forEach(b => b.disabled = isSpec || state.running);
+      document.querySelectorAll(".mode-btn, .time-btn").forEach(b => b.disabled = state.running);
     }
 
     function appendDigit(d) {
@@ -1450,20 +1271,19 @@
     function bindEvents() {
       els.soundToggle.onclick = () => { 
         state.soundOn = !state.soundOn; 
-        if (state.soundOn && state.running && !state.finished) {
-          startBGM();
-        } else {
-          stopBGM();
-        }
+        if (state.soundOn && state.running && !state.finished) startBGM(); else stopBGM();
         render(); 
       };
       document.querySelectorAll(".mode-btn").forEach(b => b.onclick = () => { if (state.running) return; state.gameMode = b.dataset.mode; render(); });
       document.querySelectorAll(".time-btn").forEach(b => b.onclick = () => { if (state.running) return; state.timeLimit = Number(b.dataset.time); state.remaining = state.timeLimit; render(); });
-      document.querySelectorAll(".target-btn").forEach(b => b.onclick = () => { if (state.running) return; state.targetCorrect = Number(b.dataset.target); render(); });
       els.startBtn.onclick = startGame; els.resetBtn.onclick = resetGame;
       els.clearSaveBtn.onclick = () => { if (state.running) return; localStorage.clear(); state.records = {}; state.clears = {}; resetGame(); };
       els.retryBtn.onclick = () => { resetGame(); startGame(); };
-      els.backToSettingsBtn.onclick = () => { resetGame(); window.scrollTo({ top: 0, behavior: "smooth" }); };
+      els.backToSettingsBtn.onclick = () => { 
+        resetGame(); 
+        exitFullScreen(); // ★ 設定に戻るときは全画面を解除する
+        window.scrollTo({ top: 0, behavior: "smooth" }); 
+      };
       els.signMinus.onclick = toggleMinus;
       document.querySelectorAll(".num-btn").forEach(b => b.onclick = () => appendDigit(b.dataset.digit));
       els.clearBtn.onclick = clearAns; els.enterBtn.onclick = submitCurrentAnswer;
