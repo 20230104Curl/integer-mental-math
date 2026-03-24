@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>正負の数 計算トレーニング</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #111827;
+      --muted: #94a3b8;
+      --line: #1f2937;
+      --text: #f8fafc;
+      --primary: #3b82f6;
+      --primary-2: #2563eb;
+      --danger: #ef4444;
+      --danger-2: #dc2626;
+      --ok: #22c55e;
+      --ok-bg: #052e1a;
+      --warn: #f59e0b;
+      --warn-bg: #3b2f05;
+      --info: #38bdf8;
+      --info-bg: #082f49;
+      --soft: #1e293b;
+      --shadow: 0 8px 20px rgba(0,0,0,0.35);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    .wrap {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 18px 20px 20px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+
+    .title {
+      margin: 0;
+      font-size: 36px;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      flex: 1;
+      max-width: 400px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 430px 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .left-panel-sticky {
+      position: sticky;
+      top: 12px;
+    }
+
+    .problem-sticky {
+      position: sticky;
+      top: 12px;
+    }
+
+    .card-header {
+      min-height: 8px;
+      padding: 8px 18px 0;
+    }
+
+    .card-body {
+      padding: 16px;
+    }
+
+    .stack {
+      display: grid;
+      gap: 12px;
+    }
+
+    .row {
+      display: grid;
+      gap: 8px;
+    }
+
+    .label {
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .btn {
+      border: 1px solid var(--line);
+      background: #ffffff;
+      color: #0f172a;
+      border-radius: 16px;
+      padding: 15px 16px;
+      font-size: 18px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: 0.15s ease;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+
+    .btn.primary {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .btn.primary:hover { background: var(--primary-2); }
+
+    .btn.danger {
+      background: var(--danger);
+      color: #fff;
+      border-color: var(--danger);
+    }
+
+    .btn.danger:hover { background: var(--danger-2); }
+
+    .btn.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .full { width: 100%; }
+
+    .progress-wrap {
+      display: grid;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .progress-head {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .progress {
+      height: 12px;
+      width: 100%;
+      border-radius: 999px;
+      background: #1e293b;
+      overflow: hidden;
+      border: 1px solid var(--line);
+    }
+
+    .progress > div {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #4ade80, #16a34a);
+      transition: width 0.2s ease;
+      border-radius: 999px;
+    }
+
+    .problem-box{
+      max-width: 820px;
+      margin: 0 auto;
+      max-width: 900px;
+      border: 2px solid #2563eb;
+      border-radius: 30px;
+      background: linear-gradient(145deg,#1e293b,#020617);
+      padding: 30px;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6), 0 0 40px rgba(37,99,235,0.35);
+      position: relative;
+    }
+
+    .problem-title{
+      position:absolute;
+      top:-16px;
+      left:20px;
+      background:#2563eb;
+      color:white;
+      padding:6px 14px;
+      font-size:14px;
+      font-weight:800;
+      border-radius:999px;
+      box-shadow:0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    .problem-text {
+      margin-top: 18px;
+      font-size: clamp(28px, 4.5vw, 54px);
+      font-weight: 800;
+      line-height: 1.4;
+      white-space: normal;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+    }
+
+    .answer-screen {
+      margin: 18px auto 0;
+      max-width: 400px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: linear-gradient(145deg,#1e293b,#0f172a);
+      color: #f8fafc;
+      padding: 18px 24px;
+      font-size: 44px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      min-height: 88px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 4px 12px rgba(0,0,0,0.5);
+    }
+
+    .answer-screen.placeholder{
+      font-size: 22px !important;
+      color: #64748b !important;
+      letter-spacing: 0.05em !important;
+      font-weight: 700 !important;
+    }
+
+    .calculator-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      max-width: 400px;
+      margin: 20px auto 0;
+    }
+
+    .key {
+      background: linear-gradient(145deg,#1e293b,#334155);
+      border: 1px solid #334155;
+      color: #f8fafc;
+      height: 72px !important;
+      border-radius: 18px !important;
+      font-size: 32px !important;
+      font-weight: 900;
+      margin: 0 !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.1s ease;
+    }
+
+    .key:active { transform: scale(0.95); }
+
+    .key.zero {
+      grid-column: span 3;
+    }
+
+    .key.minus{
+      background:linear-gradient(145deg,#f87171,#dc2626);
+      border:1px solid #b91c1c;
+      color:#fff;
+    }
+
+    .key.num{
+      background:linear-gradient(145deg,#334155,#0f172a);
+      border:1px solid #475569;
+      color:#ffffff;
+    }
+
+    .key.enter{
+      grid-row: span 2;
+      height: 100% !important;
+      background:linear-gradient(145deg,#4ade80,#16a34a);
+      border:1px solid #15803d;
+      color:#ffffff;
+      padding: 0 !important;
+      font-size: 20px !important;
+    }
+
+    .key.clear{
+      background:linear-gradient(145deg,#fbbf24,#d97706);
+      border:1px solid #b45309;
+      color:#ffffff;
+    }
+
+    .message {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .combo {
+      margin-top: 8px;
+      color: #ea580c;
+      font-weight: 900;
+      font-size: 20px;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.55; }
+      100% { opacity: 1; }
+    }
+
+    .section-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .mini-card {
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 14px;
+    }
+
+    .mini-title {
+      font-size: 20px;
+      font-weight: 900;
+      margin-bottom: 12px;
+    }
+
+    .note {
+      font-size: 14px;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+
+    .history {
+      display: grid;
+      gap: 8px;
+    }
+
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      background: var(--soft);
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-size: 16px;
+    }
+
+    .history-item .left {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .tag {
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .tag.ng {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .finish-actions {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(180px, 240px));
+      justify-content: center;
+      gap: 14px;
+    }
+
+    .finish-btn {
+      min-height: 72px;
+      font-size: 24px;
+      font-weight: 900;
+      border-radius: 20px;
+    }
+
+    .score-grid{
+      margin-top:10px;
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:12px;
+    }
+
+    .score-item{
+      text-align:center;
+      padding:10px;
+      border-radius:12px;
+      background:#0f172a;
+    }
+
+    .score-label{
+      font-size:15px;
+      font-weight:700;
+      opacity:.8;
+    }
+
+    .score-value{
+      font-size:32px;
+      font-weight:900;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .scroll-area {
+      max-height: 320px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+    .scroll-area::-webkit-scrollbar {
+      width: 6px;
+    }
+    .scroll-area::-webkit-scrollbar-thumb {
+      background: #475569;
+      border-radius: 999px;
+    }
+
+    @media (max-width: 1280px) and (orientation: landscape) {
+      .wrap { padding: 14px 16px 16px; }
+      .grid { grid-template-columns: 390px 1fr; gap: 14px; }
+      .title { font-size: 30px; }
+      .btn { font-size: 17px; padding: 14px 14px; }
+      .answer-screen { font-size: 36px; min-height: 92px; }
+    }
+
+    @media (max-width: 1024px) and (orientation: landscape) {
+      .grid { grid-template-columns: 350px 1fr; gap: 12px; }
+      .title { font-size: 26px; }
+    }
+
+    @media (max-width: 900px) and (orientation: portrait) {
+      .topbar { flex-direction: column; align-items: stretch; gap: 12px; }
+      .top-actions { max-width: 100% !important; justify-content: flex-start; }
+      .grid { grid-template-columns: 1fr; }
+      .section-grid { grid-template-columns: 1fr; }
+      .answer-screen { font-size: 36px; min-height: 78px; max-width: 100%; }
+      .calculator-grid { max-width: 100%; }
+      .key { height: 64px !important; font-size: 28px !important; }
+      .finish-actions { grid-template-columns: 1fr; }
+      .left-panel-sticky, .problem-sticky { position: static; }
+    }
+
+    .problem-box{
+      background: linear-gradient(135deg, #1e293b, #020617);
+      border: 2px solid #3b82f6;
+      box-shadow: 0 0 30px rgba(59,130,246,0.35), 0 12px 40px rgba(0,0,0,0.5);
+      border-radius: 24px;
+      padding: 36px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      min-height:420px;
+      margin-top:20px;
+      margin-bottom:20px;
+    }
+
+    .grid > .card:last-child{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+    }
+
+    @media (min-width:1100px){
+      .problem-box{ min-height:520px; }
+    }
+
+    .grid{
+      grid-template-columns: 290px 1fr !important;
+      gap: 14px !important;
+      align-items: stretch !important;
+    }
+
+    .left-panel-sticky .card-body{
+      padding: 16px !important;
+      padding-top: 52px !important;
+      align-content: start !important; 
+    }
+
+    .left-panel-sticky .stack{
+      gap: 10px !important;
+    }
+
+    .left-panel-sticky .btn{
+      padding: 8px !important;
+      font-size: 13px !important;
+      border-radius: 10px;
+      line-height: 1.2;
+    }
+
+    #levelButtons{
+      display: flex !important;
+      flex-wrap: wrap;
+      gap: 6px !important;
+    }
+
+    #levelButtons .btn{
+      flex: 1 1 calc(25% - 6px);
+      min-width: 62px;
+    }
+
+    #levelButtons .btn[data-level="4"]{
+      flex: 1 1 100%;
+    }
+
+    #opButtons{
+      display: grid !important;
+      grid-template-columns: repeat(3, 1fr) !important;
+      gap: 6px !important;
+    }
+
+    #opButtons .btn{
+      min-width: 0 !important;
+    }
+
+    #startBtn{ font-size: 15px !important; }
+    #resetBtn, #clearSaveBtn{ font-size: 12px !important; }
+
+    @media (max-width:900px) and (orientation:portrait){
+      .grid{ grid-template-columns: 1fr !important; }
+      #levelButtons .btn{
+        flex: 1 1 calc(50% - 6px);
+        min-width: 90px;
+      }
+      #levelButtons .btn[data-level="4"]{
+        flex: 1 1 100%;
+      }
+      .problem-sticky .card-body,
+      .left-panel-sticky .card-body{ min-height: auto; padding-top: 16px !important; }
+    }
+
+    .sound-btn{
+      margin-top: 6px;
+      background: #0f172a;
+      color: #f8fafc;
+      border-color: #334155;
+    }
+    .sound-btn:hover{ background: #1e293b; }
+
+    .left-panel-sticky, .problem-sticky{ align-self: stretch; }
+    .problem-sticky .card-body{
+      display:flex;
+      flex-direction:column;
+      justify-content:flex-start;
+      padding-top: 16px !important;
+      min-height:100%;
+    }
+
+    #soundToggle {
+      font-size: 20px !important;
+    }
+
+    #modeSection .btn, #opButtons .btn, #levelButtons .btn, #timeSection .btn, .grid-2 .btn{
+      padding:6px 8px !important;
+      height:34px !important;
+      min-height:34px !important;
+      font-size:13px !important;
+      line-height:1 !important;
+      border-radius:10px !important;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div>
+        <h1 class="title">正負の数 計算トレーニング</h1>
+      </div>
+      <div class="top-actions">
+        <div id="progressArea" class="progress-wrap">
+          <div class="progress-head"><span id="progressLabel">進行状況</span><span id="progressText">0%</span></div>
+          <div class="progress"><div id="progressBar"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card left-panel-sticky">
+        <div class="card-header"></div>
+        <div class="card-body stack">
+          <!-- ★ モード選択を Score Attack と サドンデス に変更 -->
+          <div id="modeSection" class="row">
+            <div class="grid-2">
+              <button class="btn mode-btn active" data-mode="time">Score Attack</button>
+              <button class="btn mode-btn" data-mode="sudden">Sudden Death</button>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="stack" id="opButtons"></div>
+          </div>
+
+          <div class="row">
+            <div class="stack" id="levelButtons"></div>
+          </div>
+
+          <div id="specialInfo" class="special-box hidden">
+            <div class="label">スペシャルモード</div>
+            <div style="margin-top:8px;font-size:24px;font-weight:800;">Sudden Death</div>
+            <div style="margin-top:6px;color:var(--muted);font-size:14px;">四則混合のSudden Deathモードです</div>
+          </div>
+
+          <div id="timeSection" class="row">
+            <div class="grid-3">
+              <button class="btn time-btn active" data-time="60">1分</button>
+              <button class="btn time-btn" data-time="120">2分</button>
+              <button class="btn time-btn" data-time="180">3分</button>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <button id="startBtn" class="btn primary">スタート</button>
+            <button id="resetBtn" class="btn">やり直し</button>
+            <button id="soundToggle" class="btn full sound-btn">🔊</button>
+            <button id="clearSaveBtn" class="btn danger full">記録削除</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card problem-sticky">
+        <div class="card-header"></div>
+        <div class="card-body stack">
+          <div class="problem-box">
+            <div class="problem-title">問題</div>
+            <div id="problemText" class="problem-text">--</div>
+            <div id="answerScreen" class="answer-screen">答えを入力</div>
+
+            <div class="calculator-grid">
+              <button class="btn key num num-btn" data-digit="7">7</button>
+              <button class="btn key num num-btn" data-digit="8">8</button>
+              <button class="btn key num num-btn" data-digit="9">9</button>
+              <button id="clearBtn" class="btn key small clear">C</button>
+
+              <button class="btn key num num-btn" data-digit="4">4</button>
+              <button class="btn key num num-btn" data-digit="5">5</button>
+              <button class="btn key num num-btn" data-digit="6">6</button>
+              <button id="signMinus" class="btn key minus">－</button>
+
+              <button class="btn key num num-btn" data-digit="1">1</button>
+              <button class="btn key num num-btn" data-digit="2">2</button>
+              <button class="btn key num num-btn" data-digit="3">3</button>
+              <button id="enterBtn" class="btn key enter">決定</button>
+
+              <button class="btn key num num-btn zero" data-digit="0">0</button>
+            </div>
+          </div>
+          <div id="message" class="message hidden"></div>
+          <div id="comboBanner" class="combo hidden">🔥 3連続正解！</div>
+
+          <div id="resultSection" class="section-grid hidden">
+            <div id="scoreSummary" class="mini-card hidden">
+              <div class="mini-title">今回の結果 <span id="recordBadge" class="tag hidden" style="background:#f59e0b;color:#fff;margin-left:8px;">🎉 NEW RECORD</span></div>
+              <div class="score-grid" id="scoreGrid"></div>
+            </div>
+
+            <div class="mini-card">
+              <div class="mini-title">自己ベスト一覧</div>
+              <div id="recordText">まだ記録はありません。</div>
+            </div>
+
+            <div class="mini-card">
+              <div class="mini-title">今回まちがえた問題</div>
+              <div id="history" class="history"><div class="note">まだ間違えた問題はありません。</div></div>
+            </div>
+          </div>
+
+          <div id="finishActions" class="finish-actions hidden">
+            <button id="retryBtn" class="btn primary finish-btn">もう一回</button>
+            <button id="backToSettingsBtn" class="btn finish-btn">設定へ戻る</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const OPERATIONS = {
+      addsub: "加減",
+      muldiv: "乗除",
+      powermix: "四則",
+    };
+
+    // ★ モードからTime Attack(target)を削除し、サドンデスを追加
+    const GAME_MODES = {
+      time: "Score Attack",
+      sudden: "Sudden Death",
+    };
+
+    const LEVELS = {
+      1: "レベル1",
+      2: "レベル2",
+      3: "レベル3",
+      4: "スペシャル",
+    };
+
+    const STORAGE_KEYS = {
+      records: "integer-mental-math-records",
+      clears: "integer-mental-math-clears",
+      last: "integer-mental-math-last-session",
+    };
+
+    const state = {
+      gameMode: "time",
+      operationType: "addsub",
+      level: 1,
+      timeLimit: 60,
+      running: false,
+      finished: false,
+      recentPatterns: [],
+      recentAnswers: [],
+      problem: null,
+      answerSign: "",
+      answerDigits: "",
+      remaining: 60,
+      elapsed: 0,
+      correct: 0,
+      wrong: 0,
+      history: [],
+      message: "",
+      soundOn: true,
+      autoSubmit: false,
+      records: loadRecords(),
+      lastSession: loadLastSession(),
+      clears: loadClears(),
+      newRecord: false,
+      combo: 0,
+      bestCombo: 0,
+      timer: null,
+    };
+
+    const els = {
+      soundToggle: document.getElementById("soundToggle"),
+      modeSection: document.getElementById("modeSection"),
+      timeSection: document.getElementById("timeSection"),
+      opButtons: document.getElementById("opButtons"),
+      levelButtons: document.getElementById("levelButtons"),
+      startBtn: document.getElementById("startBtn"),
+      resetBtn: document.getElementById("resetBtn"),
+      clearSaveBtn: document.getElementById("clearSaveBtn"),
+      progressArea: document.getElementById("progressArea"),
+      progressLabel: document.getElementById("progressLabel"),
+      progressText: document.getElementById("progressText"),
+      progressBar: document.getElementById("progressBar"),
+      problemText: document.getElementById("problemText"),
+      answerScreen: document.getElementById("answerScreen"),
+      signMinus: document.getElementById("signMinus"),
+      clearBtn: document.getElementById("clearBtn"),
+      enterBtn: document.getElementById("enterBtn"),
+      message: document.getElementById("message"),
+      comboBanner: document.getElementById("comboBanner"),
+      finishActions: document.getElementById("finishActions"),
+      retryBtn: document.getElementById("retryBtn"),
+      backToSettingsBtn: document.getElementById("backToSettingsBtn"),
+      recordText: document.getElementById("recordText"),
+      history: document.getElementById("history"),
+      resultSection: document.getElementById("resultSection"),
+      scoreSummary: document.getElementById("scoreSummary"),
+    };
+
+    function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+    function randNo01(min, max) { let n = 0; do { n = randInt(min, max); } while (n === 0 || n === 1 || n === -1); return n; }
+    function choice(arr) { return arr[randInt(0, arr.length - 1)]; }
+    function getTermCount(level) { return level === 1 ? 2 : level === 2 ? 3 : level === 3 ? 4 : 5; }
+    function formatSignedNumber(n) { return n < 0 ? `(${n})` : `${n}`; }
+    function powerText(base, exponent) { if (base >= 0) return `${base}^${exponent}`; return `(${base})^${exponent}`; }
+    function powerHTML(base, exponent) {
+      if (base >= 0) return `<span>${base}<sup style="font-size:.55em;position:relative;top:-0.55em;">${exponent}</sup></span>`;
+      return `<span>(${base})<sup style="font-size:.55em;position:relative;top:-0.55em;">${exponent}</sup></span>`;
+    }
+    function plainTerm(value) { return { text: formatSignedNumber(value), display: formatSignedNumber(value), value }; }
+    function powerTerm(base, exponent) { return { text: powerText(base, exponent), display: powerHTML(base, exponent), value: base ** exponent }; }
+    function powerTermNoParen(base, exponent) {
+      const abs = Math.abs(base);
+      return { text: `-${abs}^${exponent}`, display: `<span>-${abs}<sup style="font-size:.55em;position:relative;top:-0.55em;">${exponent}</sup></span>`, value: -(abs ** exponent) };
+    }
+    function createPowerTerm() {
+      const base = choice([-4, -3, -2, 2, 3, 4]); const exponent = choice([2, 3]);
+      if (base < 0 && Math.random() < 0.33) return powerTermNoParen(base, exponent);
+      return powerTerm(base, exponent);
+    }
+    function buildExpression(terms, ops) {
+      let text = terms[0].text; let display = terms[0].display;
+      for (let i = 1; i < terms.length; i++) { text += ` ${ops[i - 1]} ${terms[i].text}`; display += ` ${ops[i - 1]} ${terms[i].display}`; }
+      return { text, display };
+    }
+
+    function createAddSubMixedProblem(level) {
+      const count = getTermCount(level);
+      let nums;
+      do { nums = Array.from({ length: count }, () => randNo01(-18, 18)); } while (nums.every(n => n > 0));
+      const ops = [];
+      for (let i = 0; i < count - 1; i++) {
+        const next = nums[i + 1]; ops.push(next < 0 && Math.random() < 0.65 ? "-" : choice(["+", "-"]));
+      }
+      let answer = nums[0];
+      for (let i = 1; i < count; i++) { answer = ops[i - 1] === "+" ? answer + nums[i] : answer - nums[i]; }
+      const terms = nums.map(plainTerm); const expression = buildExpression(terms, ops);
+      return { ...expression, answer, patternSignature: ops.join("") };
+    }
+
+    function createMulDivMixedProblem(level, includePowers = true) {
+      const count = getTermCount(level);
+      for (let attempt = 0; attempt < 100; attempt++) {
+        const start = randNo01(-10, 10);
+        const ops = Array.from({ length: count - 1 }, () => choice(["×", "÷"]));
+        const terms = [plainTerm(start)];
+        let current = start;
+        for (let i = 0; i < ops.length; i++) {
+          if (ops[i] === "×") {
+            const usePower = includePowers && Math.random() < 0.5;
+            if (usePower) {
+              let p = createPowerTerm(); terms.push(p); current *= p.value;
+            } else {
+              const nextValue = randNo01(-9, 9); terms.push(plainTerm(nextValue)); current *= nextValue;
+            }
+          } else {
+            const divisors = [-9,-8,-7,-6,-5,-4,-3,-2,2,3,4,5,6,7,8,9].filter(d => current % d === 0);
+            if (divisors.length > 0) {
+              const picked = choice(divisors); terms.push(plainTerm(picked)); current /= picked;
+            } else {
+              ops[i] = "×"; const nextValue = randNo01(-9, 9); terms.push(plainTerm(nextValue)); current *= nextValue;
+            }
+          }
+        }
+        if (terms.some(t => t.value < 0)) {
+          const expression = buildExpression(terms, ops);
+          return { ...expression, answer: current, patternSignature: ops.join("") };
+        }
+      }
+      return createAddSubMixedProblem(level);
+    }
+
+    function createPowerMixedProblem(level) {
+      for (let attempt = 0; attempt < 100; attempt++) {
+        const count = getTermCount(level);
+        function createFactor() { return Math.random() < 0.55 ? createPowerTerm() : plainTerm(randNo01(-6, 6)); }
+        function createMulDivChain(len) {
+          const terms = [createFactor()]; const ops = []; let val = terms[0].value;
+          for (let i = 1; i < len; i++) {
+            const op = choice(["×", "÷"]);
+            if (op === "×") {
+              const f = createFactor(); terms.push(f); ops.push("×"); val *= f.value;
+            } else {
+              const divs = [2,3,4,5,-2,-3].filter(d => val % d === 0);
+              if (divs.length > 0) {
+                const dVal = choice(divs); terms.push(plainTerm(dVal)); ops.push("÷"); val /= dVal;
+              } else {
+                const f = createFactor(); terms.push(f); ops.push("×"); val *= f.value;
+              }
+            }
+          }
+          return { terms, ops, value: val };
+        }
+        const groups = [createMulDivChain(2), createMulDivChain(count - 2)];
+        const groupOp = choice(["+", "-"]);
+        let ans = groupOp === "+" ? groups[0].value + groups[1].value : groups[0].value - groups[1].value;
+        let allTerms = [...groups[0].terms, ...groups[1].terms];
+        if (allTerms.some(t => t.value < 0)) {
+          const allOps = [...groups[0].ops, groupOp, ...groups[1].ops];
+          const expression = buildExpression(allTerms, allOps);
+          return { ...expression, answer: ans, patternSignature: "powermix" };
+        }
+      }
+      return createAddSubMixedProblem(level);
+    }
+
+    function isTooEasyAnswer(answer, type, level) {
+      if (answer === 0) return true;
+      if (answer === 1 || answer === -1) return true;
+      return false;
+    }
+
+    function generateProblem(type, level, recentSignatures = [], recentAnswers = []) {
+      const creators = { addsub: () => createAddSubMixedProblem(level), muldiv: () => createMulDivMixedProblem(level, true), powermix: () => createPowerMixedProblem(level) };
+      const makeProblem = creators[type] || creators.addsub;
+      for (let attempt = 0; attempt < 30; attempt++) {
+        const problem = makeProblem(); const signature = problem.patternSignature || problem.text;
+        if (recentSignatures.includes(signature)) continue;
+        if (isTooEasyAnswer(problem.answer, type, level)) continue;
+        if (recentAnswers.includes(problem.answer)) continue;
+        return problem;
+      }
+      return makeProblem();
+    }
+
+    function buildRecordKey({ gameMode, operationType, timeLimit, level }) {
+      return `${gameMode}_${operationType}_${timeLimit}_${level}`;
+    }
+
+    function buildClearKey(operationType, level) { return `${operationType}_${level}`; }
+    function loadRecords() { try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.records) || "{}"); } catch { return {}; } }
+    function saveRecords(records) { localStorage.setItem(STORAGE_KEYS.records, JSON.stringify(records)); }
+    function loadClears() { try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.clears) || "{}"); } catch { return {}; } }
+    function saveClears(clears) { localStorage.setItem(STORAGE_KEYS.clears, JSON.stringify(clears)); }
+    function loadLastSession() { try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.last) || "null"); } catch { return null; } }
+    function saveLastSession(correct, wrong, seconds) {
+      const data = { correct, wrong, seconds }; state.lastSession = data; localStorage.setItem(STORAGE_KEYS.last, JSON.stringify(data));
+    }
+
+    /* === 全画面表示の制御 === */
+    function requestFullScreen() {
+      const docEl = document.documentElement;
+      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        if (docEl.requestFullscreen) {
+          docEl.requestFullscreen().catch(err => console.log(err));
+        } else if (docEl.webkitRequestFullscreen) { /* Safari用 */
+          docEl.webkitRequestFullscreen();
+        }
+      }
+    }
+
+    function exitFullScreen() {
+      if (document.fullscreenElement || document.webkitFullscreenElement) {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) { /* Safari用 */
+          document.webkitExitFullscreen();
+        }
+      }
+    }
+
+    /* === BGM・効果音 === */
+    let bgmCtx = null; let bgmInterval = null; let bgmStep = 0;
+    const BGM_MELODY = [ 72,-1,76,72, 79,-1,76,-1, 72,76,79,76, 84,-1,79,-1, 69,-1,72,69, 76,-1,72,-1, 69,72,76,72, 81,-1,76,-1, 67,-1,71,67, 74,-1,71,-1, 67,71,74,71, 79,-1,74,-1, 72,-1,76,72, 79,-1,76,-1, 84,84,84,-1, 72,-1,-1,-1 ];
+    const BGM_BASS = [ 48,-1,48,-1, 48,-1,48,-1, 48,-1,48,-1, 48,55,48,55, 45,-1,45,-1, 45,-1,45,-1, 45,-1,45,-1, 45,52,45,52, 43,-1,43,-1, 43,-1,43,-1, 43,-1,43,-1, 43,50,43,50, 48,-1,48,-1, 48,-1,48,-1, 48,48,48,-1, 48,-1,-1,-1 ];
+    function playBGMNote(note, type, vol, dur) {
+      if (!bgmCtx) return;
+      const osc = bgmCtx.createOscillator(); const gain = bgmCtx.createGain();
+      osc.type = type; osc.frequency.value = 440 * Math.pow(2, (note - 69) / 12);
+      osc.connect(gain); gain.connect(bgmCtx.destination);
+      gain.gain.setValueAtTime(0, bgmCtx.currentTime); gain.gain.linearRampToValueAtTime(vol, bgmCtx.currentTime + 0.02); gain.gain.exponentialRampToValueAtTime(0.001, bgmCtx.currentTime + dur);
+      osc.start(bgmCtx.currentTime); osc.stop(bgmCtx.currentTime + dur + 0.1);
+    }
+    function startBGM() {
+      if (!state.soundOn) return;
+      if (!bgmCtx) { const AudioContext = window.AudioContext || window.webkitAudioContext; if (AudioContext) bgmCtx = new AudioContext(); }
+      if (!bgmCtx) return;
+      if (bgmCtx.state === 'suspended') bgmCtx.resume();
+      if (bgmInterval) return;
+      bgmStep = 0;
+      bgmInterval = setInterval(() => {
+        if (!state.soundOn || !state.running || state.finished) return;
+        const m = BGM_MELODY[bgmStep % BGM_MELODY.length]; const b = BGM_BASS[bgmStep % BGM_BASS.length];
+        if (m !== -1) playBGMNote(m, 'sine', 0.06, 0.15);
+        if (b !== -1) playBGMNote(b, 'square', 0.04, 0.1);
+        bgmStep++;
+      }, 130);
+    }
+    function stopBGM() { if (bgmInterval) { clearInterval(bgmInterval); bgmInterval = null; } }
+
+    function playTone(type = "correct", param = 0) {
+      if (!state.soundOn) return;
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator(); const g = ctx.createGain();
+      osc.connect(g); g.connect(ctx.destination);
+      let duration = 0.24;
+      if (type === "correct") {
+        const baseFreq = 660 + Math.min(param * 30, 400); const endFreq = 880 + Math.min(param * 40, 500);
+        osc.frequency.setValueAtTime(baseFreq, ctx.currentTime); osc.frequency.linearRampToValueAtTime(endFreq, ctx.currentTime + 0.12);
+        g.gain.setValueAtTime(0.001, ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.15, ctx.currentTime + 0.01); g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.22);
+      } else if (type === "wrong") {
+        osc.type = "sawtooth"; osc.frequency.setValueAtTime(150, ctx.currentTime); osc.frequency.linearRampToValueAtTime(100, ctx.currentTime + 0.2);
+        g.gain.setValueAtTime(0.001, ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.15, ctx.currentTime + 0.01); g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.22);
+      } else if (type === "gameover") {
+        osc.type = "square"; duration = 0.8;
+        osc.frequency.setValueAtTime(200, ctx.currentTime); osc.frequency.exponentialRampToValueAtTime(50, ctx.currentTime + 0.6);
+        g.gain.setValueAtTime(0.001, ctx.currentTime); g.gain.linearRampToValueAtTime(0.15, ctx.currentTime + 0.05); g.gain.linearRampToValueAtTime(0.001, ctx.currentTime + 0.7);
+      } else if (type === "tick") {
+        osc.type = "square"; duration = 0.1; osc.frequency.setValueAtTime(880, ctx.currentTime);
+        g.gain.setValueAtTime(0.001, ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.06, ctx.currentTime + 0.01); g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+      } else if (type === "timeup") {
+        osc.type = "sawtooth"; duration = 1.0; osc.frequency.setValueAtTime(440, ctx.currentTime); osc.frequency.linearRampToValueAtTime(400, ctx.currentTime + 0.8);
+        g.gain.setValueAtTime(0.001, ctx.currentTime); g.gain.linearRampToValueAtTime(0.15, ctx.currentTime + 0.1); g.gain.linearRampToValueAtTime(0.001, ctx.currentTime + 0.9);
+      } else if (type === "finish") {
+        duration = 0.4; osc.frequency.setValueAtTime(440, ctx.currentTime); osc.frequency.linearRampToValueAtTime(880, ctx.currentTime + 0.1);
+        osc.frequency.setValueAtTime(880, ctx.currentTime + 0.1); osc.frequency.linearRampToValueAtTime(1760, ctx.currentTime + 0.3);
+        g.gain.setValueAtTime(0.001, ctx.currentTime); g.gain.linearRampToValueAtTime(0.15, ctx.currentTime + 0.05); g.gain.linearRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+      } else {
+        duration = 0.1; osc.frequency.setValueAtTime(520, ctx.currentTime); osc.frequency.linearRampToValueAtTime(560, ctx.currentTime + 0.06);
+        g.gain.setValueAtTime(0.001, ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.08, ctx.currentTime + 0.01); g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+      }
+      osc.start(ctx.currentTime); osc.stop(ctx.currentTime + duration);
+    }
+
+    function displayAnswer(sign, digits) { if (!sign && !digits) return "答えを入力"; return `${sign}${digits}`; }
+    function parseAnswer(sign, digits) { if (digits === "") return null; const num = Number(digits); return sign === "-" ? -num : num; }
+
+    function getCurrentRecordKey() { return buildRecordKey({ gameMode: state.gameMode, operationType: state.operationType, timeLimit: state.timeLimit, level: state.level }); }
+    
+    // ★ スペシャルレベル(Lv4)の解放条件：四則・レベル3の「サドンデス」で10問連続正解
+    function getSpecialUnlocked() { 
+      return state.clears[buildClearKey("powermix", 3)]; 
+    }
+
+    function updateBestRecord(finalCorrect, finalWrong) {
+      const key = getCurrentRecordKey(); const nextRecords = { ...state.records };
+      let isNew = false; const best = nextRecords[key];
+      if (state.gameMode === "time") {
+        if (!best || finalCorrect > best.bestCorrect || (finalCorrect === best.bestCorrect && finalWrong < best.wrong)) {
+          nextRecords[key] = { mode: state.gameMode, bestCorrect: finalCorrect, wrong: finalWrong, level: state.level, operationType: state.operationType, timeLimit: state.timeLimit };
+          isNew = true;
+        }
+      } else {
+        // サドンデス
+        if (!best || finalCorrect > best.bestCorrect) {
+          nextRecords[key] = { mode: state.gameMode, bestCorrect: finalCorrect, wrong: finalWrong, level: state.level, operationType: state.operationType };
+          isNew = true;
+        }
+      }
+      state.records = nextRecords; saveRecords(nextRecords); state.newRecord = isNew;
+    }
+
+    function scrollToResultSection() { if (els.resultSection) { requestAnimationFrame(() => { els.resultSection.scrollIntoView({ behavior: "smooth", block: "start" }); }); } }
+
+    function finishGame() {
+      stopTimer(); stopBGM(); state.running = false; state.finished = true; state.message = "";
+      updateBestRecord(state.correct, state.wrong);
+      saveLastSession(state.correct, state.wrong, state.elapsed);
+      
+      // ★ 四則・レベル3のサドンデスで10問連続正解したらクリアフラグを立てる（スペシャル解放用）
+      if (state.gameMode === "sudden" && state.operationType === "powermix" && state.level === 3) {
+        if (state.correct >= 10) {
+          state.clears[buildClearKey("powermix", 3)] = true; saveClears(state.clears);
+        }
+      }
+
+      if (state.gameMode === "time" && state.remaining === 0) {
+        playTone("timeup");
+      } else if (state.gameMode === "sudden" && state.wrong > 0) {
+        playTone("gameover");
+      } else {
+        playTone("finish");
+      }
+      render(); updateFinalScore(); scrollToResultSection();
+    }
+
+    function resetGame() {
+      stopTimer(); stopBGM(); state.running = false; state.finished = false; state.newRecord = false;
+      state.problem = generateProblem(state.operationType, state.level, [], []);
+      state.answerSign = ""; state.answerDigits = ""; state.remaining = state.timeLimit;
+      state.elapsed = 0; state.correct = 0; state.wrong = 0; state.combo = 0; state.bestCombo = 0;
+      state.history = []; state.message = "";
+      if (els.scoreSummary) els.scoreSummary.classList.add("hidden");
+      render();
+    }
+
+    function startGame() {
+      requestFullScreen(); // ★ ゲーム開始時に全画面表示にする
+      stopTimer(); state.running = true; state.finished = false; state.newRecord = false;
+      state.answerSign = ""; state.answerDigits = ""; state.elapsed = 0; state.correct = 0;
+      state.wrong = 0; state.combo = 0; state.bestCombo = 0; state.history = [];
+      state.problem = generateProblem(state.operationType, state.level, [], []);
+      if (state.gameMode === "time") state.remaining = state.timeLimit;
+      startTimer();
+      startBGM();
+      render();
+    }
+
+    function startTimer() {
+      stopTimer();
+      state.timer = setInterval(() => {
+        state.elapsed += 1;
+        if (state.gameMode === "time") {
+          if (state.remaining <= 1) { state.remaining = 0; finishGame(); return; }
+          state.remaining -= 1;
+          if (state.remaining > 0 && state.remaining <= 10) playTone("tick");
+        }
+        render();
+      }, 1000);
+    }
+    function stopTimer() { if (state.timer) { clearInterval(state.timer); state.timer = null; } }
+
+    function submitCurrentAnswer() {
+      if (!state.running || state.finished) return;
+      const userAns = parseAnswer(state.answerSign, state.answerDigits);
+      if (userAns === null) return;
+      const isCorrect = userAns === state.problem.answer;
+      
+      if (state.gameMode === "sudden") {
+        if (isCorrect) {
+          state.correct++; state.combo++; if (state.combo > state.bestCombo) state.bestCombo = state.combo;
+          state.history = [{ ...state.problem, userAns, isCorrect: true }, ...state.history].slice(0, 8);
+          playTone("correct", state.combo);
+          state.answerSign = ""; state.answerDigits = "";
+          state.problem = generateProblem(state.operationType, state.level, [state.problem.patternSignature], [state.problem.answer]);
+        } else {
+          state.wrong++; state.history = [{ ...state.problem, userAns, isCorrect: false }, ...state.history].slice(0, 8);
+          finishGame(); return;
+        }
+      } else {
+        // Score Attack
+        if (isCorrect) {
+          state.correct++; state.combo++; if (state.combo > state.bestCombo) state.bestCombo = state.combo;
+          state.history = [{ ...state.problem, userAns, isCorrect: true }, ...state.history].slice(0, 8);
+          playTone("correct", state.combo);
+        } else {
+          state.wrong++; state.combo = 0;
+          state.history = [{ ...state.problem, userAns, isCorrect: false }, ...state.history].slice(0, 8);
+          playTone("wrong");
+        }
+        state.answerSign = ""; state.answerDigits = "";
+        state.problem = generateProblem(state.operationType, state.level, [state.problem.patternSignature], [state.problem.answer]);
+      }
+      render();
+    }
+
+    function renderOpButtons() {
+      els.opButtons.innerHTML = Object.entries(OPERATIONS).map(([key, label]) => {
+        const active = state.operationType === key ? "active" : "";
+        return `<button class="btn ${active}" data-op="${key}">${label}</button>`;
+      }).join("");
+      els.opButtons.querySelectorAll("button").forEach(btn => {
+        btn.onclick = () => {
+          if (state.running) return; state.operationType = btn.dataset.op; state.level = 1;
+          state.problem = generateProblem(state.operationType, 1, [], []); render();
+        };
+      });
+    }
+
+    function renderLevelButtons() {
+      const unlocked = getSpecialUnlocked();
+      els.levelButtons.innerHTML = [1,2,3].map(lv => {
+        const active = state.level === lv ? "active" : "";
+        return `<button class="btn ${active}" data-level="${lv}">${LEVELS[lv]}</button>`;
+      }).join("") + `<button class="btn ${state.level === 4 ? "active" : ""}" data-level="4" ${(!unlocked || state.operationType !== "powermix") ? "disabled" : ""}>${unlocked && state.operationType === "powermix" ? "✨ " : "🔒 "}${LEVELS[4]}</button>`;
+      els.levelButtons.querySelectorAll("button").forEach(btn => {
+        btn.onclick = () => {
+          if (state.running) return; const lv = Number(btn.dataset.level);
+          if (lv === 4 && (!getSpecialUnlocked() || state.operationType !== "powermix")) return;
+          state.level = lv; state.problem = generateProblem(state.operationType, lv, [], []); render();
+        };
+      });
+    }
+
+    function updateFinalScore() {
+      let html = '';
+      if (state.gameMode === 'time') {
+        html = `<div class="score-item"><div class="score-label">正解</div><div class="score-value">${state.correct}</div></div><div class="score-item"><div class="score-label">ミス</div><div class="score-value" style="color:#ef4444">${state.wrong}</div></div><div class="score-item"><div class="score-label">最大コンボ</div><div class="score-value">${state.bestCombo}</div></div>`;
+      } else {
+        html = `<div class="score-item"><div class="score-label">連続正解</div><div class="score-value">${state.correct}</div></div><div class="score-item"><div class="score-label">タイム</div><div class="score-value">${state.elapsed}秒</div></div>`;
+      }
+      document.getElementById('scoreGrid').innerHTML = html;
+      const recordBadge = document.getElementById('recordBadge');
+      if(recordBadge) recordBadge.classList.toggle('hidden', !state.newRecord);
+      els.scoreSummary.classList.remove("hidden");
+    }
+
+    function renderRecordText() {
+      if (Object.keys(state.records).length === 0) { els.recordText.innerHTML = "まだ記録はありません。"; return; }
+      const grouped = {};
+      for (const key in state.records) {
+        const r = state.records[key]; const gKey = `${r.operationType}_${r.level}`;
+        if (!grouped[gKey]) grouped[gKey] = []; grouped[gKey].push(r);
+      }
+      let html = '<div class="scroll-area" style="display:grid; gap:16px; margin-top:8px;">';
+      Object.keys(grouped).sort().forEach(gKey => {
+        const rs = grouped[gKey]; const first = rs[0];
+        html += `<div><div style="font-size:15px; font-weight:900; color:var(--primary); margin-bottom:6px; border-bottom:1px solid var(--line); padding-bottom:4px;">${OPERATIONS[first.operationType]} / ${LEVELS[first.level]}</div><div style="display:grid; gap:6px;">`;
+        rs.forEach(r => {
+          const isCurrent = state.operationType === r.operationType && state.level === r.level && ((state.gameMode === 'time' && state.timeLimit === r.timeLimit) || (state.gameMode === 'sudden'));
+          const bg = isCurrent ? 'rgba(59,130,246,0.15)' : 'var(--soft)';
+          const border = isCurrent ? '1px solid var(--primary)' : '1px solid transparent';
+          let cond = "", res = "";
+          if (r.mode === 'time') { 
+            const timeStr = r.timeLimit % 60 === 0 ? (r.timeLimit / 60) + "分" : r.timeLimit + "秒";
+            cond = ` Score Attack (${timeStr})`; 
+            res = `${r.bestCorrect}問正解 <span style="font-size:13px; color:var(--danger); margin-left:6px; font-weight:600;">ミス${r.wrong}</span>`; 
+          }
+          else { cond = ` Sudden Death`; res = `${r.bestCorrect}問連続正解`; }
+          html += `<div style="font-size:16px; display:flex; justify-content:space-between; align-items:center; background:${bg}; border:${border}; padding:10px 14px; border-radius:12px;"><span style="font-size:13px; color:var(--muted);">${cond}</span><span style="font-weight:800;">${res}</span></div>`;
+        });
+        html += `</div></div>`;
+      });
+      html += '</div>'; els.recordText.innerHTML = html;
+    }
+
+    function render() {
+      els.soundToggle.textContent = state.soundOn ? "🔊" : "🔇";
+      els.soundToggle.className = `btn full sound-btn ${state.soundOn ? "primary" : ""}`;
+      document.querySelectorAll(".mode-btn").forEach(b => b.classList.toggle("active", b.dataset.mode === state.gameMode));
+      document.querySelectorAll(".time-btn").forEach(b => b.classList.toggle("active", Number(b.dataset.time) === state.timeLimit));
+      
+      els.timeSection.classList.toggle("hidden", state.gameMode !== "time");
+      
+      renderOpButtons(); renderLevelButtons();
+      
+      if (state.gameMode === "time") {
+        els.progressArea.classList.remove("hidden");
+        els.progressLabel.textContent = "残り時間"; 
+        let remStr = `${state.remaining}秒`;
+        if (state.remaining >= 60) {
+          const m = Math.floor(state.remaining / 60); const s = state.remaining % 60;
+          remStr = s === 0 ? `${m}分` : `${m}分${s}秒`;
+        }
+        els.progressText.textContent = remStr;
+        els.progressBar.style.width = `${(state.remaining / state.timeLimit) * 100}%`;
+      } else {
+        els.progressArea.classList.remove("hidden");
+        els.progressLabel.textContent = "連続正解"; 
+        els.progressText.textContent = `${state.correct}問`;
+        els.progressBar.style.width = `100%`; // サドンデス時はバーを常に満タンにしておく
+      }
+      
+      els.problemText.innerHTML = state.problem ? state.problem.display : "--";
+      const ansDisp = displayAnswer(state.answerSign, state.answerDigits);
+      els.answerScreen.textContent = ansDisp; els.answerScreen.classList.toggle("placeholder", ansDisp === "答えを入力");
+      els.message.textContent = state.message; els.message.classList.toggle("hidden", !state.message);
+      els.signMinus.classList.toggle("selected-sign", state.answerSign === "-");
+      const combo = state.combo >= 3 && state.running && !state.finished;
+      els.comboBanner.classList.toggle("hidden", !combo); if (combo) els.comboBanner.textContent = `🔥 ${state.combo}連続正解！`;
+      renderRecordText();
+      els.history.innerHTML = state.history.filter(h => !h.isCorrect).length ? state.history.filter(h => !h.isCorrect).map(h => `<div class="history-item"><div class="left">${h.text} = ${h.userAns}　（正解：${h.answer}）</div><div class="tag ng">不正解</div></div>`).join("") : `<div class="note">まだ間違えた問題はありません。</div>`;
+      els.resultSection.classList.toggle("hidden", !state.finished);
+      els.finishActions.classList.toggle("hidden", !state.finished);
+      els.scoreSummary.classList.toggle("hidden", !state.finished);
+      els.startBtn.disabled = state.running; els.clearSaveBtn.disabled = state.running;
+      document.querySelectorAll(".mode-btn, .time-btn").forEach(b => b.disabled = state.running);
+    }
+
+    function appendDigit(d) {
+      if (!state.running || state.finished || state.answerDigits.length >= 4) return;
+      state.answerDigits = (state.answerDigits === "0") ? d : state.answerDigits + d;
+      playTone("tap"); render();
+    }
+    function toggleMinus() { if (!state.running || state.finished) return; state.answerSign = state.answerSign === "-" ? "" : "-"; playTone("tap"); render(); }
+    function backspace() { if (!state.running || state.finished) return; if (state.answerDigits) state.answerDigits = state.answerDigits.slice(0, -1); else state.answerSign = ""; playTone("tap"); render(); }
+    function clearAns() { if (!state.running || state.finished) return; state.answerSign = ""; state.answerDigits = ""; playTone("tap"); render(); }
+
+    function bindEvents() {
+      els.soundToggle.onclick = () => { 
+        state.soundOn = !state.soundOn; 
+        if (state.soundOn && state.running && !state.finished) startBGM(); else stopBGM();
+        render(); 
+      };
+      document.querySelectorAll(".mode-btn").forEach(b => b.onclick = () => { if (state.running) return; state.gameMode = b.dataset.mode; render(); });
+      document.querySelectorAll(".time-btn").forEach(b => b.onclick = () => { if (state.running) return; state.timeLimit = Number(b.dataset.time); state.remaining = state.timeLimit; render(); });
+      els.startBtn.onclick = startGame; els.resetBtn.onclick = resetGame;
+      els.clearSaveBtn.onclick = () => { if (state.running) return; localStorage.clear(); state.records = {}; state.clears = {}; resetGame(); };
+      els.retryBtn.onclick = () => { resetGame(); startGame(); };
+      els.backToSettingsBtn.onclick = () => { 
+        resetGame(); 
+        exitFullScreen(); // ★ 設定に戻るときは全画面を解除する
+        window.scrollTo({ top: 0, behavior: "smooth" }); 
+      };
+      els.signMinus.onclick = toggleMinus;
+      document.querySelectorAll(".num-btn").forEach(b => b.onclick = () => appendDigit(b.dataset.digit));
+      els.clearBtn.onclick = clearAns; els.enterBtn.onclick = submitCurrentAnswer;
+
+      window.addEventListener("keydown", e => {
+        if (!state.running || state.finished) return;
+        if (e.key === "Enter") { e.preventDefault(); submitCurrentAnswer(); }
+        else if (e.key === "Backspace") { e.preventDefault(); backspace(); }
+        else if (e.key === "Escape") { e.preventDefault(); clearAns(); }
+        else if (e.key === "-") { e.preventDefault(); toggleMinus(); }
+        else if (/^\d$/.test(e.key)) { e.preventDefault(); appendDigit(e.key); }
+      });
+    }
+
+    state.problem = generateProblem(state.operationType, state.level, [], []);
+    bindEvents(); render();
+  </script>
+</body>
+</html>
